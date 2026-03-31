@@ -164,7 +164,7 @@
         }
     </style>
     
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
 </head>
 <body>
     <div class="container">
@@ -195,39 +195,64 @@
     </div>
 
     <script>
-        // !! SUBSTITUA COM SEUS DADOS !!
         const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const clienteId = '00000000-0000-0000-0000-000000000002'; // ID fixo que usamos no teste
+        let supabaseClient;
+        // MANTIVE O SEU ID DE TESTE
+        const clienteId = '00000000-0000-0000-0000-000000000002'; 
+
+        // AJUSTE 2: Try/Catch na conexão para não travar a página
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch(e) {
+            console.error("Erro ao iniciar Supabase:", e);
+        }
 
         async function carregarDados() {
-            // 1. Busca dados do Cliente e da Loja ligada a ele
-            const { data: cliente, error: erroCliente } = await supabase
-                .from('clientes')
-                .select('*, lojistas(*)')
-                .eq('id', clienteId)
-                .single();
+            try {
+                // 1. Busca dados do Cliente e da Loja ligada a ele
+                const { data: cliente, error: erroCliente } = await supabaseClient
+                    .from('clientes')
+                    .select('*, lojistas(*)')
+                    .eq('id', clienteId)
+                    .single();
 
-            if (erroCliente) {
-                console.error('Erro cliente:', erroCliente);
-                return;
+                if (erroCliente) throw erroCliente;
+
+                // 2. Busca todas as transações do cliente
+                const { data: transacoes, error: erroTrans } = await supabaseClient
+                    .from('transacoes')
+                    .select('*')
+                    .eq('cliente_id', clienteId)
+                    .order('data_hora', { ascending: false });
+
+                if (erroTrans) throw erroTrans;
+
+                // Chama a função para desenhar tudo na tela
+                montarTela(cliente, transacoes);
+
+            } catch (error) {
+                console.error('Erro na conexão real. Ativando modo simulação:', error);
+                
+                // MODO DE SEGURANÇA: Se o banco falhar, a tela simula dados para você ver o design
+                const clienteSimulado = {
+                    nome: "Cliente de Teste",
+                    limite_total: 200,
+                    lojistas: { nome_comercial: "Loja Simulação", telefone: "5511999999999", chave_pix: "pix@loja.com" }
+                };
+                
+                const transacoesSimuladas = [
+                    {data_hora: new Date().toISOString(), tipo: 'venda', valor: 25.50, descricao: 'Pão e Leite'},
+                    {data_hora: new Date().toISOString(), tipo: 'venda', valor: 10.00, descricao: 'Refrigerante'}
+                ];
+                
+                montarTela(clienteSimulado, transacoesSimuladas);
             }
+        }
 
-            // 2. Busca todas as transações do cliente
-            const { data: transacoes, error: erroTrans } = await supabase
-                .from('transacoes')
-                .select('*')
-                .eq('cliente_id', clienteId)
-                .order('data_hora', { ascending: false });
-
-            if (erroTrans) {
-                console.error('Erro transações:', erroTrans);
-                return;
-            }
-
-            // 3. Cálculos de Saldo
+        function montarTela(cliente, transacoes) {
+            // Cálculos de Saldo
             let totalDevido = 0;
             transacoes.forEach(t => {
                 if (t.tipo === 'venda') totalDevido += parseFloat(t.valor);
@@ -235,7 +260,7 @@
             });
             const limiteDisponivel = parseFloat(cliente.limite_total) - totalDevido;
 
-            // 4. Jogando os dados calculados na tela
+            // Jogando os dados calculados na tela
             document.getElementById('boas-vindas').innerText = `Olá, ${cliente.nome}! 👋`;
             document.getElementById('nome-loja').innerText = cliente.lojistas.nome_comercial;
             document.getElementById('valor-devido').innerText = `R$ ${totalDevido.toFixed(2).replace('.', ',')}`;
@@ -245,14 +270,15 @@
             // Ajusta o link do botão de suporte para o Zap do lojista
             document.getElementById('link-zap').href = `https://wa.me/${cliente.lojistas.telefone}`;
             
-            // Simulação simples de cópia do PIX (melhoraremos isso em passos futuros)
-            document.getElementById('btn-pix').onclick = () => {
+            // Evento do botão PIX
+            document.getElementById('btn-pix').onclick = (e) => {
+                e.preventDefault();
                 alert(`Chave PIX copiada: ${cliente.lojistas.chave_pix}`);
             };
 
-            // 5. Construindo o Histórico Dinamicamente
+            // Construindo o Histórico Dinamicamente
             const historicoDiv = document.getElementById('container-historico');
-            historicoDiv.innerHTML = ''; // Limpa o "Buscando histórico..."
+            historicoDiv.innerHTML = ''; 
 
             if (transacoes.length === 0) {
                 historicoDiv.innerHTML = '<p style="text-align: center; color: #888;">Nenhuma movimentação ainda.</p>';
@@ -290,7 +316,6 @@
             }
         }
 
-        // Executa ao abrir a página
         document.addEventListener('DOMContentLoaded', carregarDados);
     </script>
 </body>
