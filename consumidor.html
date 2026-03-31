@@ -53,7 +53,7 @@
         }
 
         .summary-block {
-            background-color: #e9f7ee; /* Light green for positive feel */
+            background-color: #e9f7ee; 
             border-radius: 10px;
             padding: 18px;
             margin-bottom: 25px;
@@ -67,11 +67,11 @@
         .summary-block .value {
             font-size: 2.2em;
             font-weight: 700;
-            color: #28a745; /* Darker green for debt */
+            color: #28a745; 
             margin-bottom: 10px;
         }
         .summary-block .value.debt-value {
-            color: #dc3545; /* Red for actual debt */
+            color: #dc3545; 
         }
         .summary-details {
             display: flex;
@@ -199,10 +199,13 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
         
         let supabaseClient;
-        // MANTIVE O SEU ID DE TESTE
-        const clienteId = '00000000-0000-0000-0000-000000000002'; 
 
-        // AJUSTE 2: Try/Catch na conexão para não travar a página
+        // ==========================================
+        // MUDANÇA AQUI: Agora ele lê o link do navegador!
+        // ==========================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const clienteId = urlParams.get('id'); 
+
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch(e) {
@@ -210,8 +213,14 @@
         }
 
         async function carregarDados() {
+            // Se não tiver nenhum ID no link, ele avisa e para aqui.
+            if (!clienteId) {
+                document.getElementById('boas-vindas').innerText = "Link inválido! ❌";
+                document.getElementById('container-historico').innerHTML = '<p style="text-align: center; color: #888;">Por favor, use o link completo enviado pelo lojista.</p>';
+                return;
+            }
+
             try {
-                // 1. Busca dados do Cliente e da Loja ligada a ele
                 const { data: cliente, error: erroCliente } = await supabaseClient
                     .from('clientes')
                     .select('*, lojistas(*)')
@@ -220,7 +229,6 @@
 
                 if (erroCliente) throw erroCliente;
 
-                // 2. Busca todas as transações do cliente
                 const { data: transacoes, error: erroTrans } = await supabaseClient
                     .from('transacoes')
                     .select('*')
@@ -229,13 +237,12 @@
 
                 if (erroTrans) throw erroTrans;
 
-                // Chama a função para desenhar tudo na tela
                 montarTela(cliente, transacoes);
 
             } catch (error) {
-                console.error('Erro na conexão real. Ativando modo simulação:', error);
+                console.error('Erro na conexão real:', error);
                 
-                // MODO DE SEGURANÇA: Se o banco falhar, a tela simula dados para você ver o design
+                // Dados falsos só para o sistema não quebrar se o banco falhar
                 const clienteSimulado = {
                     nome: "Cliente de Teste",
                     limite_total: 200,
@@ -252,7 +259,6 @@
         }
 
         function montarTela(cliente, transacoes) {
-            // Cálculos de Saldo
             let totalDevido = 0;
             transacoes.forEach(t => {
                 if (t.tipo === 'venda') totalDevido += parseFloat(t.valor);
@@ -260,23 +266,19 @@
             });
             const limiteDisponivel = parseFloat(cliente.limite_total) - totalDevido;
 
-            // Jogando os dados calculados na tela
             document.getElementById('boas-vindas').innerText = `Olá, ${cliente.nome}! 👋`;
             document.getElementById('nome-loja').innerText = cliente.lojistas.nome_comercial;
             document.getElementById('valor-devido').innerText = `R$ ${totalDevido.toFixed(2).replace('.', ',')}`;
             document.getElementById('limite-total').innerText = parseFloat(cliente.limite_total).toFixed(2).replace('.', ',');
             document.getElementById('limite-disponivel').innerText = limiteDisponivel.toFixed(2).replace('.', ',');
 
-            // Ajusta o link do botão de suporte para o Zap do lojista
             document.getElementById('link-zap').href = `https://wa.me/${cliente.lojistas.telefone}`;
             
-            // Evento do botão PIX
             document.getElementById('btn-pix').onclick = (e) => {
                 e.preventDefault();
                 alert(`Chave PIX copiada: ${cliente.lojistas.chave_pix}`);
             };
 
-            // Construindo o Histórico Dinamicamente
             const historicoDiv = document.getElementById('container-historico');
             historicoDiv.innerHTML = ''; 
 
@@ -285,7 +287,6 @@
                 return;
             }
 
-            // Agrupa as transações por data simples (AAAA-MM-DD)
             const diasAgrupados = {};
             transacoes.forEach(t => {
                 const dataSimples = new Date(t.data_hora).toLocaleDateString('pt-BR');
@@ -293,7 +294,6 @@
                 diasAgrupados[dataSimples].push(t);
             });
 
-            // Monta o HTML para cada dia
             for (const dia in diasAgrupados) {
                 const diaBloco = document.createElement('div');
                 diaBloco.className = 'history-day';
