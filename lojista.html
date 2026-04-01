@@ -183,6 +183,7 @@
 
         <h2>⚡ AÇÕES RÁPIDAS</h2>
         <button class="action-button primary" id="acao-nova-venda">➕ Nova Venda no Fiado</button>
+        <button class="action-button secondary" id="acao-novo-pagamento" style="background-color: #007bff;">💰 Registrar Pagamento</button>
         <button class="action-button secondary" id="acao-novo-cliente">👤 Cadastrar Novo Cliente</button>
 
         <div id="form-nova-venda" style="display: none; background-color: #e9f7ee; border: 1px solid #c3e6cb; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
@@ -201,6 +202,25 @@
             <div style="display: flex; gap: 10px;">
                 <button id="btn-salvar-venda" style="flex: 2; background-color: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Salvar Fiado</button>
                 <button id="btn-cancelar-venda" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
+            </div>
+        </div>
+
+        <div id="form-novo-pagamento" style="display: none; background-color: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0; color: #0d47a1;">💰 Registrar Pagamento</h3>
+            
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Cliente:</label>
+            <select id="select-cliente-pagamento" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc;">
+            </select>
+
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Valor Pago (R$):</label>
+            <input type="number" id="valor-pagamento" step="0.01" placeholder="Ex: 50.00" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Descrição (Opcional):</label>
+            <input type="text" id="desc-pagamento" placeholder="Ex: Pagou em dinheiro" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+
+            <div style="display: flex; gap: 10px;">
+                <button id="btn-salvar-pagamento" style="flex: 2; background-color: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Confirmar Pagamento</button>
+                <button id="btn-cancelar-pagamento" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
             </div>
         </div>
 
@@ -307,7 +327,10 @@
             containerClientes.innerHTML = ''; 
 
             const selectCliente = document.getElementById('select-cliente');
+            const selectClientePagamento = document.getElementById('select-cliente-pagamento');
+            
             selectCliente.innerHTML = '';
+            selectClientePagamento.innerHTML = '';
 
             if (!clientes || clientes.length === 0) {
                 containerClientes.innerHTML = '<p style="text-align: center; color: #888;">Nenhum cliente cadastrado.</p>';
@@ -317,10 +340,17 @@
             let totalGeralDevedor = 0;
 
             for (const cliente of clientes) {
-                const option = document.createElement('option');
-                option.value = cliente.id;
-                option.innerText = cliente.nome;
-                selectCliente.appendChild(option);
+                // Preenche o select de Venda
+                const optionVenda = document.createElement('option');
+                optionVenda.value = cliente.id;
+                optionVenda.innerText = cliente.nome;
+                selectCliente.appendChild(optionVenda);
+
+                // Preenche o select de Pagamento (Novo)
+                const optionPagamento = document.createElement('option');
+                optionPagamento.value = cliente.id;
+                optionPagamento.innerText = cliente.nome;
+                selectClientePagamento.appendChild(optionPagamento);
 
                 let saldoDevedor = 0; 
                 
@@ -382,8 +412,10 @@
             document.getElementById('total-geral-receber').innerText = `R$ ${totalGeralDevedor.toFixed(2).replace('.', ',')}`;
         }
 
+        // FUNÇÕES DE EXIBIÇÃO: VENDA
         function abrirFormularioVenda() {
             fecharFormularioCliente(); 
+            fecharFormularioPagamento();
             document.getElementById('form-nova-venda').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -399,8 +431,24 @@
             document.getElementById('desc-venda').value = '';
         }
 
+        // FUNÇÕES DE EXIBIÇÃO: PAGAMENTO (NOVO)
+        function abrirFormularioPagamento() {
+            fecharFormularioCliente();
+            fecharFormularioVenda();
+            document.getElementById('form-novo-pagamento').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function fecharFormularioPagamento() {
+            document.getElementById('form-novo-pagamento').style.display = 'none';
+            document.getElementById('valor-pagamento').value = '';
+            document.getElementById('desc-pagamento').value = '';
+        }
+
+        // FUNÇÕES DE EXIBIÇÃO: CLIENTE
         function abrirFormularioCliente() {
             fecharFormularioVenda(); 
+            fecharFormularioPagamento();
             document.getElementById('form-novo-cliente').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -412,6 +460,7 @@
             document.getElementById('limite-cliente').value = '';
         }
 
+        // FUNÇÃO PARA SALVAR VENDA
         async function salvarVenda() {
             const clienteSelecionado = document.getElementById('select-cliente').value;
             const valor = document.getElementById('valor-venda').value;
@@ -444,6 +493,7 @@
             }
         }
 
+        // FUNÇÃO PARA SALVAR CLIENTE
         async function salvarCliente() {
             const nome = document.getElementById('nome-cliente').value;
             const telefone = document.getElementById('tel-cliente').value;
@@ -475,13 +525,21 @@
             }
         }
 
+        // EVENTOS INICIAIS
         document.addEventListener('DOMContentLoaded', () => {
             carregarPainelLojista();
             
+            // Eventos Venda
             document.getElementById('acao-nova-venda').onclick = abrirFormularioVenda;
             document.getElementById('btn-cancelar-venda').onclick = fecharFormularioVenda;
             document.getElementById('btn-salvar-venda').onclick = salvarVenda;
 
+            // Eventos Pagamento (Novo)
+            document.getElementById('acao-novo-pagamento').onclick = abrirFormularioPagamento;
+            document.getElementById('btn-cancelar-pagamento').onclick = fecharFormularioPagamento;
+            // O botão de salvar pagamento ainda não tem função vinculada (faremos no Passo 3)
+
+            // Eventos Cliente
             document.getElementById('acao-novo-cliente').onclick = abrirFormularioCliente;
             document.getElementById('btn-cancelar-cliente').onclick = fecharFormularioCliente;
             document.getElementById('btn-salvar-cliente').onclick = salvarCliente;
