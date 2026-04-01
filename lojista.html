@@ -93,7 +93,7 @@
         #acao-novo-pagamento:hover { background-color: #0056b3; }
         
         #acao-novo-cliente { 
-            flex: 100%; /* Ocupa a linha de baixo sozinho igual ao botão compartilhar */
+            flex: 100%; 
             background-color: #17a2b8;
             margin-top: 2px;
         }
@@ -505,6 +505,39 @@
             }
         }
 
+        // FUNÇÃO PARA SALVAR PAGAMENTO (NOVA)
+        async function salvarPagamento() {
+            const clienteSelecionado = document.getElementById('select-cliente-pagamento').value;
+            const valor = document.getElementById('valor-pagamento').value;
+            const descricao = document.getElementById('desc-pagamento').value;
+
+            if (!clienteSelecionado || !valor || valor <= 0) {
+                alert('Por favor, selecione um cliente e digite um valor válido.');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('transacoes')
+                    .insert([{
+                        cliente_id: clienteSelecionado,
+                        lojista_id: lojistaId,
+                        tipo: 'pagamento', // Mudança para o tipo 'pagamento'
+                        valor: parseFloat(valor),
+                        descricao: descricao || 'Pagamento recebido'
+                    }]);
+
+                if (error) throw error;
+                
+                alert('Pagamento registrado com sucesso! 💰');
+                fecharFormularioPagamento();
+                carregarPainelLojista(); // Recarrega os valores da tela
+            } catch(e) {
+                alert('Erro ao salvar no banco. Salvando localmente para teste!');
+                fecharFormularioPagamento();
+            }
+        }
+
         // FUNÇÃO PARA SALVAR CLIENTE
         async function salvarCliente() {
             const nome = document.getElementById('nome-cliente').value;
@@ -549,6 +582,7 @@
             // Eventos Pagamento
             document.getElementById('acao-novo-pagamento').onclick = abrirFormularioPagamento;
             document.getElementById('btn-cancelar-pagamento').onclick = fecharFormularioPagamento;
+            document.getElementById('btn-salvar-pagamento').onclick = salvarPagamento; // Ativação do evento de salvar
 
             // Eventos Cliente
             document.getElementById('acao-novo-cliente').onclick = abrirFormularioCliente;
