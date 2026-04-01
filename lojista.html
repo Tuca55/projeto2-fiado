@@ -145,23 +145,6 @@
             margin: 0 10px;
         }
         .menu-footer a:hover { text-decoration: underline; }
-
-        /* Estilo para o botão do Zap de sucesso */
-        .btn-zap-sucesso {
-            display: block;
-            background-color: #25d366;
-            color: white;
-            text-align: center;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            text-decoration: none;
-            margin-top: 15px;
-            transition: background-color 0.2s;
-        }
-        .btn-zap-sucesso:hover {
-            background-color: #1ebd54;
-        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
@@ -220,12 +203,10 @@
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Limite de Crédito (R$):</label>
             <input type="number" id="limite-cliente" step="0.01" placeholder="Ex: 100.00" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
 
-            <div style="display: flex; gap: 10px;" id="botoes-originais-cliente">
+            <div style="display: flex; gap: 10px;">
                 <button id="btn-salvar-cliente" style="flex: 2; background-color: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cadastrar Cliente</button>
                 <button id="btn-cancelar-cliente" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
             </div>
-
-            <div id="container-sucesso-cliente" style="display: none;"></div>
         </div>
 
         <h2>👥 SEUS CLIENTES</h2>
@@ -245,7 +226,6 @@
         
         let supabaseClient;
         const lojistaId = '00000000-0000-0000-0000-000000000001'; 
-        let nomeDaLojaGlobal = "Minha Loja"; // Guardando o nome da loja para usar nas mensagens
 
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -255,6 +235,7 @@
 
         async function carregarPainelLojista() {
             try {
+                // 1. Busca dados da Loja
                 const { data: loja, error: erroLoja } = await supabaseClient
                     .from('lojistas')
                     .select('*')
@@ -263,8 +244,8 @@
 
                 if (erroLoja) throw erroLoja;
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
-                nomeDaLojaGlobal = loja.nome_comercial;
 
+                // 2. BUSCA AS TRANSAÇÕES DE HOJE PARA OS TOTAIS
                 const hoje = new Date().toISOString().split('T')[0]; 
                 
                 const { data: transacoesHoje, error: erroTransHoje } = await supabaseClient
@@ -286,6 +267,7 @@
                 document.getElementById('vendido-hoje').innerText = `R$ ${totalVendido.toFixed(2).replace('.', ',')}`;
                 document.getElementById('recebido-hoje').innerText = `R$ ${totalRecebido.toFixed(2).replace('.', ',')}`;
 
+                // 3. Busca clientes
                 const { data: clientes, error: erroClientes } = await supabaseClient
                     .from('clientes')
                     .select('*')
@@ -299,6 +281,8 @@
                 console.error("Falha na conexão real. Ativando modo de simulação...", error);
                 
                 document.getElementById('boas-vindas').innerText = `Olá, Lojista (Modo Simulação)! 👋`;
+                document.getElementById('vendido-hoje').innerText = "R$ 0,00";
+                document.getElementById('recebido-hoje').innerText = "R$ 0,00";
                 
                 const clientesFalsos = [
                     {id: '1', nome: 'Cliente Teste 1', telefone: '5511999999999', limite_total: 100},
@@ -320,6 +304,7 @@
                 return;
             }
 
+            // AJUSTE NOVO: Variável para acumular a soma do fiado de todos os clientes
             let totalGeralDevedor = 0;
 
             for (const cliente of clientes) {
@@ -343,9 +328,10 @@
                         });
                     }
                 } catch(e) { 
-                    saldoDevedor = 30.00; 
+                    saldoDevedor = 30.00; // Simulação se falhar
                 }
 
+                // AJUSTE NOVO: Só acumula valores positivos (para não diminuir se alguém tiver saldo sobrando)
                 if (saldoDevedor > 0) {
                     totalGeralDevedor += saldoDevedor;
                 }
@@ -375,6 +361,7 @@
                 containerClientes.appendChild(card);
             }
 
+            // AJUSTE NOVO: Atualiza o campo lá em cima no Resumo com a soma total
             document.getElementById('total-geral-receber').innerText = `R$ ${totalGeralDevedor.toFixed(2).replace('.', ',')}`;
         }
 
@@ -429,9 +416,6 @@
 
         function abrirFormularioCliente() {
             fecharFormularioVenda(); 
-            // Reseta a área de sucesso e os botões quando reabre o formulário
-            document.getElementById('container-sucesso-cliente').style.display = 'none';
-            document.getElementById('botoes-originais-cliente').style.display = 'flex';
             document.getElementById('form-novo-cliente').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -454,43 +438,21 @@
             }
 
             try {
-                // Pedimos para o Supabase retornar os dados do cliente que acabou de criar
-                const { data: novoCliente, error } = await supabaseClient
+                const { error } = await supabaseClient
                     .from('clientes')
                     .insert([{
                         lojista_id: lojistaId,
                         nome: nome,
                         telefone: telefone,
                         limite_total: parseFloat(limite)
-                    }])
-                    .select()
-                    .single();
+                    }]);
 
                 if (error) throw error;
 
-                // Sumir com os botões normais para evitar cadastros duplicados acidentais
-                document.getElementById('botoes-originais-cliente').style.display = 'none';
-
-                // AJUSTE NOVO: Montar o link e exibir o botão do WhatsApp
-                const linkCliente = `https://SEU-USUARIO.github.io/projeto-fiado/cliente.html?id=${novoCliente.id}`;
-                const textoMensagem = encodeURIComponent(`Olá, ${novoCliente.nome}! 🎉 Você foi cadastrado na caderneta digital do ${nomeDaLojaGlobal}. Para acompanhar suas compras e saldo atualizado, basta acessar este link: ${linkCliente}`);
-                
-                const areaSucesso = document.getElementById('container-sucesso-cliente');
-                areaSucesso.innerHTML = `
-                    <p style="color: #155724; font-weight: 600; text-align: center; margin-top: 15px;">🎉 Cliente cadastrado com sucesso!</p>
-                    <a href="https://wa.me/${novoCliente.telefone}?text=${textoMensagem}" target="_blank" class="btn-zap-sucesso">📲 Enviar link por WhatsApp</a>
-                    <button id="btn-fechar-sucesso" style="width: 100%; margin-top: 10px; background-color: #6c757d; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Fechar Formulário</button>
-                `;
-                areaSucesso.style.display = 'block';
-
-                // Ativa o botão de fechar que acabamos de criar
-                document.getElementById('btn-fechar-sucesso').onclick = () => {
-                    fecharFormularioCliente();
-                    carregarPainelLojista();
-                };
-
+                alert('Cliente cadastrado com sucesso! 🎉');
+                fecharFormularioCliente();
+                carregarPainelLojista(); 
             } catch(e) {
-                console.error(e);
                 alert('Erro ao salvar cliente no banco. Simulação concluída!');
                 fecharFormularioCliente();
             }
