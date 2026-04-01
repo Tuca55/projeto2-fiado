@@ -1,221 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeto Fiado - Lojista</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-        .container {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            width: 100%;
-            max-width: 400px;
-            padding: 25px;
-            box-sizing: border-box;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
-        h2 {
-            color: #555;
-            font-size: 1.2em;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-        }
-        .greeting {
-            color: #007bff;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px dashed #eee;
-            font-size: 1em;
-            color: #666;
-        }
-        .summary-item:last-of-type {
-            border-bottom: none;
-        }
-        .summary-value {
-            font-weight: 700;
-            color: #333;
-        }
-        .summary-value.positive { color: #28a745; }
-
-        .action-button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            text-align: center;
-            text-decoration: none;
-            color: #fff;
-        }
-        .action-button.primary { background-color: #007bff; }
-        .action-button.primary:hover { background-color: #0056b3; }
-        .action-button.secondary { background-color: #6c757d; }
-        .action-button.secondary:hover { background-color: #5a6268; }
-
-        .client-card {
-            background-color: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .client-name {
-            font-weight: 700;
-            font-size: 1.1em;
-            color: #333;
-        }
-        .client-status {
-            font-size: 0.85em;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .client-status.debt { color: #dc3545; }
-        .client-status.ok { color: #28a745; }
-        .client-status.warning { color: #ffc107; }
-
-        .client-details {
-            font-size: 0.95em;
-            color: #666;
-        }
-        .client-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .client-actions a, .client-actions button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9em;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            color: #fff;
-        }
-        .client-actions .btn-cobrar { background-color: #007bff; }
-        .client-actions .btn-cobrar:hover { background-color: #0056b3; }
-        .client-actions .btn-vender { background-color: #28a745; }
-        .client-actions .btn-vender:hover { background-color: #218838; }
-
-        .menu-footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 0.9em;
-        }
-        .menu-footer a {
-            color: #007bff;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-        .menu-footer a:hover { text-decoration: underline; }
-    </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1>CADERNETA DE FIADO</h1>
-        <p class="greeting" id="boas-vindas">Carregando loja...</p>
-
-        <h2>📊 RESUMO DE HOJE</h2>
-        <div class="summary-item">
-            <span>Total Vendido no Fiado:</span>
-            <span class="summary-value positive" id="vendido-hoje">R$ 0,00</span>
-        </div>
-        <div class="summary-item">
-            <span>Total Recebido:</span>
-            <span class="summary-value positive" id="recebido-hoje">R$ 0,00</span>
-        </div>
-
-        <h2>⚡ AÇÕES RÁPIDAS</h2>
-        <button class="action-button primary" id="acao-nova-venda">➕ Nova Venda no Fiado</button>
-        <button class="action-button secondary" id="acao-novo-cliente">👤 Cadastrar Novo Cliente</button>
-
-        <div id="form-nova-venda" style="display: none; background-color: #e9f7ee; border: 1px solid #c3e6cb; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <h3 style="margin-top: 0; color: #155724;">📝 Lançar Nova Venda</h3>
-            
-            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Cliente:</label>
-            <select id="select-cliente" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc;">
-            </select>
-
-            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Valor (R$):</label>
-            <input type="number" id="valor-venda" step="0.01" placeholder="Ex: 15.50" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
-            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Descrição (Opcional):</label>
-            <input type="text" id="desc-venda" placeholder="Ex: Pão e leite" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
-            <div style="display: flex; gap: 10px;">
-                <button id="btn-salvar-venda" style="flex: 2; background-color: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Salvar Fiado</button>
-                <button id="btn-cancelar-venda" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
-            </div>
-        </div>
-
-        <div id="form-novo-cliente" style="display: none; background-color: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-            <h3 style="margin-top: 0; color: #0d47a1;">👤 Cadastrar Novo Cliente</h3>
-            
-            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nome do Cliente:</label>
-            <input type="text" id="nome-cliente" placeholder="Ex: Dona Maria" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
-            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Telefone (WhatsApp):</label>
-            <input type="text" id="tel-cliente" placeholder="Ex: 5511999999999" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
-            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Limite de Crédito (R$):</label>
-            <input type="number" id="limite-cliente" step="0.01" placeholder="Ex: 100.00" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
-            <div style="display: flex; gap: 10px;">
-                <button id="btn-salvar-cliente" style="flex: 2; background-color: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cadastrar Cliente</button>
-                <button id="btn-cancelar-cliente" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
-            </div>
-        </div>
-
-        <h2>👥 SEUS CLIENTES</h2>
-        <div id="lista-clientes">
-            <p style="text-align: center; color: #888;">Buscando clientes...</p>
-        </div>
-
-        <div class="menu-footer">
-            <a href="#">⚙️ Configurações</a>
-            <a href="#">🗓️ Histórico Completo</a>
-        </div>
-    </div>
-
-    <script>
+<script>
         const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
         
@@ -240,10 +23,10 @@
                 if (erroLoja) throw erroLoja;
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
 
-                // 2. BUSCA AS TRANSAÇÕES DE HOJE PARA OS TOTAIS (AJUSTE NOVO)
-                const hoje = new Date().toISOString().split('T')[0]; 
+                // 2. Busca os dados de transações do dia para somar os totais
+                const hoje = new Date().toISOString().split('T')[0]; // Pega a data de hoje no formato AAAA-MM-DD
                 
-                const { data: transacoesHoje, error: erroTransHoje } = await supabaseClient
+                const { data: transacoesHoje, error: erroTrans } = await supabaseClient
                     .from('transacoes')
                     .select('valor, tipo')
                     .eq('lojista_id', lojistaId)
@@ -252,15 +35,17 @@
                 let totalVendido = 0;
                 let totalRecebido = 0;
 
-                if (!erroTransHoje && transacoesHoje) {
+                if (transacoesHoje) {
                     transacoesHoje.forEach(t => {
                         if (t.tipo === 'venda') totalVendido += parseFloat(t.valor);
                         if (t.tipo === 'pagamento') totalRecebido += parseFloat(t.valor);
                     });
                 }
 
+                // Atualiza os valores do resumo na tela
                 document.getElementById('vendido-hoje').innerText = `R$ ${totalVendido.toFixed(2).replace('.', ',')}`;
                 document.getElementById('recebido-hoje').innerText = `R$ ${totalRecebido.toFixed(2).replace('.', ',')}`;
+
 
                 // 3. Busca clientes
                 const { data: clientes, error: erroClientes } = await supabaseClient
@@ -276,7 +61,7 @@
                 console.error("Falha na conexão real. Ativando modo de simulação...", error);
                 
                 document.getElementById('boas-vindas').innerText = `Olá, Lojista (Modo Simulação)! 👋`;
-                document.getElementById('vendido-hoje').innerText = "R$ 0,00";
+                document.getElementById('vendido-hoje').innerText = "R$ 45,00";
                 document.getElementById('recebido-hoje').innerText = "R$ 0,00";
                 
                 const clientesFalsos = [
@@ -454,5 +239,3 @@
             document.getElementById('btn-salvar-cliente').onclick = salvarCliente;
         });
     </script>
-</body>
-</html>
