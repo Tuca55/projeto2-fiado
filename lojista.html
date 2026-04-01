@@ -62,6 +62,7 @@
             color: #333;
         }
         .summary-value.positive { color: #28a745; }
+        .summary-value.negative { color: #dc3545; }
 
         .action-button {
             display: block;
@@ -115,9 +116,11 @@
             display: flex;
             gap: 10px;
             margin-top: 10px;
+            flex-wrap: wrap;
         }
         .client-actions a, .client-actions button {
             flex: 1;
+            min-width: 120px;
             padding: 10px;
             border: none;
             border-radius: 6px;
@@ -132,6 +135,13 @@
         .client-actions .btn-cobrar:hover { background-color: #0056b3; }
         .client-actions .btn-vender { background-color: #28a745; }
         .client-actions .btn-vender:hover { background-color: #218838; }
+        
+        .client-actions .btn-compartilhar { 
+            flex: 100%;
+            background-color: #17a2b8;
+            margin-top: 5px;
+        }
+        .client-actions .btn-compartilhar:hover { background-color: #138496; }
 
         .menu-footer {
             margin-top: 30px;
@@ -161,6 +171,10 @@
         <div class="summary-item">
             <span>Total Recebido:</span>
             <span class="summary-value positive" id="recebido-hoje">R$ 0,00</span>
+        </div>
+        <div class="summary-item" style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 5px;">
+            <span style="font-weight: 600; color: #333;">Total Geral a Receber:</span>
+            <span class="summary-value negative" id="total-geral-receber">R$ 0,00</span>
         </div>
 
         <h2>⚡ AÇÕES RÁPIDAS</h2>
@@ -221,8 +235,8 @@
         
         let supabaseClient;
         const lojistaId = '00000000-0000-0000-0000-000000000001'; 
+        let nomeDaLojaGlobal = "Minha Loja";
 
-        // Tenta conectar, se falhar, avisa no console
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch(e) {
@@ -231,7 +245,6 @@
 
         async function carregarPainelLojista() {
             try {
-                // Tenta carregar dados da Loja
                 const { data: loja, error: erroLoja } = await supabaseClient
                     .from('lojistas')
                     .select('*')
@@ -240,8 +253,29 @@
 
                 if (erroLoja) throw erroLoja;
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
+                nomeDaLojaGlobal = loja.nome_comercial;
 
-                // Tenta carregar clientes
+                const hoje = new Date().toISOString().split('T')[0]; 
+                
+                const { data: transacoesHoje, error: erroTransHoje } = await supabaseClient
+                    .from('transacoes')
+                    .select('valor, tipo')
+                    .eq('lojista_id', lojistaId)
+                    .gte('data_hora', `${hoje}T00:00:00Z`);
+
+                let totalVendido = 0;
+                let totalRecebido = 0;
+
+                if (!erroTransHoje && transacoesHoje) {
+                    transacoesHoje.forEach(t => {
+                        if (t.tipo === 'venda') totalVendido += parseFloat(t.valor);
+                        if (t.tipo === 'pagamento') totalRecebido += parseFloat(t.valor);
+                    });
+                }
+
+                document.getElementById('vendido-hoje').innerText = `R$ ${totalVendido.toFixed(2).replace('.', ',')}`;
+                document.getElementById('recebido-hoje').innerText = `R$ ${totalRecebido.toFixed(2).replace('.', ',')}`;
+
                 const { data: clientes, error: erroClientes } = await supabaseClient
                     .from('clientes')
                     .select('*')
@@ -254,7 +288,6 @@
             } catch (error) {
                 console.error("Falha na conexão real. Ativando modo de simulação...", error);
                 
-                // MODO DE EMERGÊNCIA/SIMULAÇÃO: Carrega dados fictícios para a página não travar
                 document.getElementById('boas-vindas').innerText = `Olá, Lojista (Modo Simulação)! 👋`;
                 
                 const clientesFalsos = [
@@ -277,13 +310,15 @@
                 return;
             }
 
+            let totalGeralDevedor = 0;
+
             for (const cliente of clientes) {
                 const option = document.createElement('option');
                 option.value = cliente.id;
                 option.innerText = cliente.nome;
                 selectCliente.appendChild(option);
 
-                let saldoDevedor = 30.00; // Valor fixo simulado caso falhe a busca de transações
+                let saldoDevedor = 0; 
                 
                 try {
                     const { data: transacoesCliente } = await supabaseClient
@@ -292,13 +327,18 @@
                         .eq('cliente_id', cliente.id);
 
                     if (transacoesCliente) {
-                        saldoDevedor = 0;
                         transacoesCliente.forEach(t => {
                             if (t.tipo === 'venda') saldoDevedor += parseFloat(t.valor);
                             if (t.tipo === 'pagamento') saldoDevedor -= parseFloat(t.valor);
                         });
                     }
-                } catch(e) { /* Segue com o valor simulado */ }
+                } catch(e) { 
+                    saldoDevedor = 30.00; 
+                }
+
+                if (saldoDevedor > 0) {
+                    totalGeralDevedor += saldoDevedor;
+                }
 
                 const limiteDisponivel = parseFloat(cliente.limite_total) - saldoDevedor;
                 let statusClasse = 'ok';
@@ -310,7 +350,14 @@
                 const card = document.createElement('div');
                 card.className = 'client-card';
                 
-                const msgZap = encodeURIComponent(`Olá, ${cliente.nome}! Passando para lembrar que sua conta no ${nomeLoja} está em R$ ${saldoDevedor.toFixed(2).replace('.', ',')}. Segue a chave PIX: ${chavePix}. Obrigado!`);
+                const telefoneLimpo = cliente.telefone.replace(/\D/g, '');
+                const telefoneFinal = telefoneLimpo.startsWith('55') ? telefoneLimpo : `55${telefoneLimpo}`;
+
+                const msgZapCobrar = encodeURIComponent(`Olá, ${cliente.nome}! Passando para lembrar que sua conta no ${nomeLoja} está em R$ ${saldoDevedor.toFixed(2).replace('.', ',')}. Segue a chave PIX: ${chavePix}. Obrigado!`);
+                
+                // 🔗 LINK DO REPOSITÓRIO ATUALIZADO AQUI:
+                const linkDoCliente = `https://tuca55.github.io/projeto2-fiado/cliente.html?id=${cliente.id}`;
+                const msgZapLink = encodeURIComponent(`Olá, ${cliente.nome}! Para acompanhar suas compras e saldo atualizado da sua conta no ${nomeLoja}, basta acessar este link: ${linkDoCliente}`);
 
                 card.innerHTML = `
                     <span class="client-name">${cliente.nome}</span>
@@ -318,15 +365,18 @@
                     <span class="client-details">Deve: R$ ${saldoDevedor.toFixed(2).replace('.', ',')}</span>
                     <span class="client-details">Limite Restante: R$ ${limiteDisponivel.toFixed(2).replace('.', ',')}</span>
                     <div class="client-actions">
-                        ${saldoDevedor > 0 ? `<a href="https://wa.me/${cliente.telefone}?text=${msgZap}" target="_blank" class="btn-cobrar">Cobrar no WhatsApp</a>` : ''}
+                        ${saldoDevedor > 0 ? `<a href="https://wa.me/${telefoneFinal}?text=${msgZapCobrar}" target="_blank" class="btn-cobrar">Cobrar no WhatsApp</a>` : ''}
                         <button class="btn-vender" onclick="abrirFormularioVendaRapida('${cliente.id}')">Lançar Venda</button>
+                        
+                        <a href="https://wa.me/${telefoneFinal}?text=${msgZapLink}" target="_blank" class="btn-compartilhar">🔗 Compartilhar Link</a>
                     </div>
                 `;
                 containerClientes.appendChild(card);
             }
+
+            document.getElementById('total-geral-receber').innerText = `R$ ${totalGeralDevedor.toFixed(2).replace('.', ',')}`;
         }
 
-        // Funções do Formulário de Venda
         function abrirFormularioVenda() {
             fecharFormularioCliente(); 
             document.getElementById('form-nova-venda').style.display = 'block';
@@ -342,6 +392,19 @@
             document.getElementById('form-nova-venda').style.display = 'none';
             document.getElementById('valor-venda').value = '';
             document.getElementById('desc-venda').value = '';
+        }
+
+        function abrirFormularioCliente() {
+            fecharForm venda(); 
+            document.getElementById('form-novo-cliente').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function fecharFormularioCliente() {
+            document.getElementById('form-novo-cliente').style.display = 'none';
+            document.getElementById('nome-cliente').value = '';
+            document.getElementById('tel-cliente').value = '';
+            document.getElementById('limite-cliente').value = '';
         }
 
         async function salvarVenda() {
@@ -376,20 +439,6 @@
             }
         }
 
-        // Funções do Formulário de Cadastro de Cliente
-        function abrirFormularioCliente() {
-            fecharFormularioVenda(); 
-            document.getElementById('form-novo-cliente').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function fecharFormularioCliente() {
-            document.getElementById('form-novo-cliente').style.display = 'none';
-            document.getElementById('nome-cliente').value = '';
-            document.getElementById('tel-cliente').value = '';
-            document.getElementById('limite-cliente').value = '';
-        }
-
         async function salvarCliente() {
             const nome = document.getElementById('nome-cliente').value;
             const telefone = document.getElementById('tel-cliente').value;
@@ -421,7 +470,6 @@
             }
         }
 
-        // Atribuição dos eventos (CLIQUES) garantidos
         document.addEventListener('DOMContentLoaded', () => {
             carregarPainelLojista();
             
