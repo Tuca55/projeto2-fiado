@@ -116,11 +116,11 @@
             display: flex;
             gap: 10px;
             margin-top: 10px;
-            flex-wrap: wrap; /* Permite que os botões quebrem linha se necessário */
+            flex-wrap: wrap;
         }
         .client-actions a, .client-actions button {
             flex: 1;
-            min-width: 120px; /* Garante tamanho mínimo para os botões de cima */
+            min-width: 120px;
             padding: 10px;
             border: none;
             border-radius: 6px;
@@ -136,9 +136,8 @@
         .client-actions .btn-vender { background-color: #28a745; }
         .client-actions .btn-vender:hover { background-color: #218838; }
         
-        /* Ajuste do botão novo de compartilhar link */
         .client-actions .btn-compartilhar { 
-            flex: 100%; /* Faz o botão ocupar toda a largura de baixo */
+            flex: 100%;
             background-color: #17a2b8;
             margin-top: 5px;
         }
@@ -351,15 +350,13 @@
                 const card = document.createElement('div');
                 card.className = 'client-card';
                 
-                // 🛠️ REMOVE ESPAÇOS E TRAÇOS DO TELEFONE
                 const telefoneLimpo = cliente.telefone.replace(/\D/g, '');
                 const telefoneFinal = telefoneLimpo.startsWith('55') ? telefoneLimpo : `55${telefoneLimpo}`;
 
-                // Mensagem padrão para cobrar a dívida
                 const msgZapCobrar = encodeURIComponent(`Olá, ${cliente.nome}! Passando para lembrar que sua conta no ${nomeLoja} está em R$ ${saldoDevedor.toFixed(2).replace('.', ',')}. Segue a chave PIX: ${chavePix}. Obrigado!`);
                 
-                // ⚠️ AJUSTE MANUAL OBRIGATÓRIO: Troque "SEU-USUARIO" pelo seu login real do GitHub
-                const linkDoCliente = `https://SEU-USUARIO.github.io/projeto-fiado/cliente.html?id=${cliente.id}`;
+                // 🔗 LINK DO REPOSITÓRIO ATUALIZADO AQUI:
+                const linkDoCliente = `https://tuca55.github.io/projeto2-fiado/cliente.html?id=${cliente.id}`;
                 const msgZapLink = encodeURIComponent(`Olá, ${cliente.nome}! Para acompanhar suas compras e saldo atualizado da sua conta no ${nomeLoja}, basta acessar este link: ${linkDoCliente}`);
 
                 card.innerHTML = `
@@ -398,7 +395,7 @@
         }
 
         function abrirFormularioCliente() {
-            fecharFormularioVenda(); 
+            fecharForm venda(); 
             document.getElementById('form-novo-cliente').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
