@@ -116,11 +116,9 @@
             display: flex;
             gap: 10px;
             margin-top: 10px;
-            flex-wrap: wrap; /* Permite que os botões quebrem linha se necessário */
         }
         .client-actions a, .client-actions button {
             flex: 1;
-            min-width: 120px; /* Garante tamanho mínimo para os botões de cima */
             padding: 10px;
             border: none;
             border-radius: 6px;
@@ -135,14 +133,6 @@
         .client-actions .btn-cobrar:hover { background-color: #0056b3; }
         .client-actions .btn-vender { background-color: #28a745; }
         .client-actions .btn-vender:hover { background-color: #218838; }
-        
-        /* Ajuste do botão novo de compartilhar link */
-        .client-actions .btn-compartilhar { 
-            flex: 100%; /* Faz o botão ocupar toda a largura de baixo */
-            background-color: #17a2b8;
-            margin-top: 5px;
-        }
-        .client-actions .btn-compartilhar:hover { background-color: #138496; }
 
         .menu-footer {
             margin-top: 30px;
@@ -155,6 +145,23 @@
             margin: 0 10px;
         }
         .menu-footer a:hover { text-decoration: underline; }
+
+        /* Estilo para o botão do Zap de sucesso */
+        .btn-zap-sucesso {
+            display: block;
+            background-color: #25d366;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+        }
+        .btn-zap-sucesso:hover {
+            background-color: #1ebd54;
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
@@ -213,10 +220,12 @@
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Limite de Crédito (R$):</label>
             <input type="number" id="limite-cliente" step="0.01" placeholder="Ex: 100.00" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
 
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; gap: 10px;" id="botoes-originais-cliente">
                 <button id="btn-salvar-cliente" style="flex: 2; background-color: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cadastrar Cliente</button>
                 <button id="btn-cancelar-cliente" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
             </div>
+
+            <div id="container-sucesso-cliente" style="display: none;"></div>
         </div>
 
         <h2>👥 SEUS CLIENTES</h2>
@@ -236,7 +245,7 @@
         
         let supabaseClient;
         const lojistaId = '00000000-0000-0000-0000-000000000001'; 
-        let nomeDaLojaGlobal = "Minha Loja";
+        let nomeDaLojaGlobal = "Minha Loja"; // Guardando o nome da loja para usar nas mensagens
 
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -351,12 +360,7 @@
                 const card = document.createElement('div');
                 card.className = 'client-card';
                 
-                // Mensagem padrão para cobrar a dívida
-                const msgZapCobrar = encodeURIComponent(`Olá, ${cliente.nome}! Passando para lembrar que sua conta no ${nomeLoja} está em R$ ${saldoDevedor.toFixed(2).replace('.', ',')}. Segue a chave PIX: ${chavePix}. Obrigado!`);
-                
-                // ATENÇÃO: Troque "SEU-USUARIO" pelo seu login real do GitHub
-                const linkDoCliente = `https://SEU-USUARIO.github.io/projeto-fiado/cliente.html?id=${cliente.id}`;
-                const msgZapLink = encodeURIComponent(`Olá, ${cliente.nome}! Para acompanhar suas compras e saldo atualizado da sua conta no ${nomeLoja}, basta acessar este link: ${linkDoCliente}`);
+                const msgZap = encodeURIComponent(`Olá, ${cliente.nome}! Passando para lembrar que sua conta no ${nomeLoja} está em R$ ${saldoDevedor.toFixed(2).replace('.', ',')}. Segue a chave PIX: ${chavePix}. Obrigado!`);
 
                 card.innerHTML = `
                     <span class="client-name">${cliente.nome}</span>
@@ -364,10 +368,8 @@
                     <span class="client-details">Deve: R$ ${saldoDevedor.toFixed(2).replace('.', ',')}</span>
                     <span class="client-details">Limite Restante: R$ ${limiteDisponivel.toFixed(2).replace('.', ',')}</span>
                     <div class="client-actions">
-                        ${saldoDevedor > 0 ? `<a href="https://wa.me/${cliente.telefone}?text=${msgZapCobrar}" target="_blank" class="btn-cobrar">Cobrar no WhatsApp</a>` : ''}
+                        ${saldoDevedor > 0 ? `<a href="https://wa.me/${cliente.telefone}?text=${msgZap}" target="_blank" class="btn-cobrar">Cobrar no WhatsApp</a>` : ''}
                         <button class="btn-vender" onclick="abrirFormularioVendaRapida('${cliente.id}')">Lançar Venda</button>
-                        
-                        <a href="https://wa.me/${cliente.telefone}?text=${msgZapLink}" target="_blank" class="btn-compartilhar">🔗 Compartilhar Link</a>
                     </div>
                 `;
                 containerClientes.appendChild(card);
@@ -391,19 +393,6 @@
             document.getElementById('form-nova-venda').style.display = 'none';
             document.getElementById('valor-venda').value = '';
             document.getElementById('desc-venda').value = '';
-        }
-
-        function abrirFormularioCliente() {
-            fecharFormularioVenda(); 
-            document.getElementById('form-novo-cliente').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function fecharFormularioCliente() {
-            document.getElementById('form-novo-cliente').style.display = 'none';
-            document.getElementById('nome-cliente').value = '';
-            document.getElementById('tel-cliente').value = '';
-            document.getElementById('limite-cliente').value = '';
         }
 
         async function salvarVenda() {
@@ -438,6 +427,22 @@
             }
         }
 
+        function abrirFormularioCliente() {
+            fecharFormularioVenda(); 
+            // Reseta a área de sucesso e os botões quando reabre o formulário
+            document.getElementById('container-sucesso-cliente').style.display = 'none';
+            document.getElementById('botoes-originais-cliente').style.display = 'flex';
+            document.getElementById('form-novo-cliente').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function fecharFormularioCliente() {
+            document.getElementById('form-novo-cliente').style.display = 'none';
+            document.getElementById('nome-cliente').value = '';
+            document.getElementById('tel-cliente').value = '';
+            document.getElementById('limite-cliente').value = '';
+        }
+
         async function salvarCliente() {
             const nome = document.getElementById('nome-cliente').value;
             const telefone = document.getElementById('tel-cliente').value;
@@ -449,21 +454,43 @@
             }
 
             try {
-                const { error } = await supabaseClient
+                // Pedimos para o Supabase retornar os dados do cliente que acabou de criar
+                const { data: novoCliente, error } = await supabaseClient
                     .from('clientes')
                     .insert([{
                         lojista_id: lojistaId,
                         nome: nome,
                         telefone: telefone,
                         limite_total: parseFloat(limite)
-                    }]);
+                    }])
+                    .select()
+                    .single();
 
                 if (error) throw error;
 
-                alert('Cliente cadastrado com sucesso! 🎉');
-                fecharFormularioCliente();
-                carregarPainelLojista(); 
+                // Sumir com os botões normais para evitar cadastros duplicados acidentais
+                document.getElementById('botoes-originais-cliente').style.display = 'none';
+
+                // AJUSTE NOVO: Montar o link e exibir o botão do WhatsApp
+                const linkCliente = `https://SEU-USUARIO.github.io/projeto-fiado/cliente.html?id=${novoCliente.id}`;
+                const textoMensagem = encodeURIComponent(`Olá, ${novoCliente.nome}! 🎉 Você foi cadastrado na caderneta digital do ${nomeDaLojaGlobal}. Para acompanhar suas compras e saldo atualizado, basta acessar este link: ${linkCliente}`);
+                
+                const areaSucesso = document.getElementById('container-sucesso-cliente');
+                areaSucesso.innerHTML = `
+                    <p style="color: #155724; font-weight: 600; text-align: center; margin-top: 15px;">🎉 Cliente cadastrado com sucesso!</p>
+                    <a href="https://wa.me/${novoCliente.telefone}?text=${textoMensagem}" target="_blank" class="btn-zap-sucesso">📲 Enviar link por WhatsApp</a>
+                    <button id="btn-fechar-sucesso" style="width: 100%; margin-top: 10px; background-color: #6c757d; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Fechar Formulário</button>
+                `;
+                areaSucesso.style.display = 'block';
+
+                // Ativa o botão de fechar que acabamos de criar
+                document.getElementById('btn-fechar-sucesso').onclick = () => {
+                    fecharFormularioCliente();
+                    carregarPainelLojista();
+                };
+
             } catch(e) {
+                console.error(e);
                 alert('Erro ao salvar cliente no banco. Simulação concluída!');
                 fecharFormularioCliente();
             }
