@@ -62,7 +62,6 @@
             color: #333;
         }
         .summary-value.positive { color: #28a745; }
-        .summary-value.negative { color: #dc3545; }
 
         .action-button {
             display: block;
@@ -154,18 +153,14 @@
         <h1>CADERNETA DE FIADO</h1>
         <p class="greeting" id="boas-vindas">Carregando loja...</p>
 
-        <h2>📊 RESUMO FINANCEIRO</h2>
+        <h2>📊 RESUMO DE HOJE</h2>
         <div class="summary-item">
-            <span>Vendido Hoje (Fiado):</span>
+            <span>Total Vendido no Fiado:</span>
             <span class="summary-value positive" id="vendido-hoje">R$ 0,00</span>
         </div>
         <div class="summary-item">
-            <span>Recebido Hoje:</span>
+            <span>Total Recebido:</span>
             <span class="summary-value positive" id="recebido-hoje">R$ 0,00</span>
-        </div>
-        <div class="summary-item" style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 5px;">
-            <span style="font-weight: 600; color: #333;">Total Geral a Receber:</span>
-            <span class="summary-value negative" id="total-geral-receber">R$ 0,00</span>
         </div>
 
         <h2>⚡ AÇÕES RÁPIDAS</h2>
@@ -245,7 +240,7 @@
                 if (erroLoja) throw erroLoja;
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
 
-                // 2. Busca as transações de hoje para os totais diários
+                // 2. BUSCA AS TRANSAÇÕES DE HOJE PARA OS TOTAIS (AJUSTE NOVO)
                 const hoje = new Date().toISOString().split('T')[0]; 
                 
                 const { data: transacoesHoje, error: erroTransHoje } = await supabaseClient
@@ -275,13 +270,14 @@
 
                 if (erroClientes) throw erroClientes;
 
-                // Passa os clientes para serem desenhados na tela e faz a soma geral
                 renderizarClientes(clientes, loja.nome_comercial, loja.chave_pix);
 
             } catch (error) {
                 console.error("Falha na conexão real. Ativando modo de simulação...", error);
                 
                 document.getElementById('boas-vindas').innerText = `Olá, Lojista (Modo Simulação)! 👋`;
+                document.getElementById('vendido-hoje').innerText = "R$ 0,00";
+                document.getElementById('recebido-hoje').innerText = "R$ 0,00";
                 
                 const clientesFalsos = [
                     {id: '1', nome: 'Cliente Teste 1', telefone: '5511999999999', limite_total: 100},
@@ -302,8 +298,6 @@
                 containerClientes.innerHTML = '<p style="text-align: center; color: #888;">Nenhum cliente cadastrado.</p>';
                 return;
             }
-
-            let totalGeralDevedor = 0; // Variável para acumular a soma de todos
 
             for (const cliente of clientes) {
                 const option = document.createElement('option');
@@ -326,12 +320,7 @@
                         });
                     }
                 } catch(e) { 
-                    saldoDevedor = 0; 
-                }
-
-                // Soma o saldo deste cliente ao total geral
-                if (saldoDevedor > 0) {
-                    totalGeralDevedor += saldoDevedor;
+                    saldoDevedor = 30.00; // Simulação se falhar
                 }
 
                 const limiteDisponivel = parseFloat(cliente.limite_total) - saldoDevedor;
@@ -358,9 +347,6 @@
                 `;
                 containerClientes.appendChild(card);
             }
-
-            // Atualiza o campo novo na tela com o total de tudo
-            document.getElementById('total-geral-receber').innerText = `R$ ${totalGeralDevedor.toFixed(2).replace('.', ',')}`;
         }
 
         function abrirFormularioVenda() {
