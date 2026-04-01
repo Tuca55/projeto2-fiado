@@ -355,7 +355,7 @@
                 const msgZapCobrar = encodeURIComponent(`Olá, ${cliente.nome}! Passando para lembrar que sua conta no ${nomeLoja} está em R$ ${saldoDevedor.toFixed(2).replace('.', ',')}. Segue a chave PIX: ${chavePix}. Obrigado!`);
                 
                 // ATENÇÃO: Troque "SEU-USUARIO" pelo seu login real do GitHub
-                const linkDoCliente = `https://SEU-USUARIO.github.io/projeto-fiado/cliente.html?id=${cliente.id}`;
+                const linkDoCliente = `https://Tuca55.github.io/projeto-fiado/cliente.html?id=${cliente.id}`;
                 const msgZapLink = encodeURIComponent(`Olá, ${cliente.nome}! Para acompanhar suas compras e saldo atualizado da sua conta no ${nomeLoja}, basta acessar este link: ${linkDoCliente}`);
 
                 card.innerHTML = `
