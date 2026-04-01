@@ -64,7 +64,6 @@
         .summary-value.positive { color: #28a745; }
         .summary-value.negative { color: #dc3545; }
 
-        /* AJUSTE DOS BOTÕES DE AÇÕES RÁPIDAS PARA O ESTILO DOS CARDS */
         .actions-container {
             display: flex;
             gap: 10px;
@@ -294,13 +293,19 @@
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
                 nomeDaLojaGlobal = loja.nome_comercial;
 
-                const hoje = new Date().toISOString().split('T')[0]; 
+                // AJUSTE: Filtrar vendas de hoje (definindo o fuso com início às 00:00:00 e fim às 23:59:59)
+                const dataInicio = new Date();
+                dataInicio.setHours(0,0,0,0);
+                
+                const dataFim = new Date();
+                dataFim.setHours(23,59,59,999);
                 
                 const { data: transacoesHoje, error: erroTransHoje } = await supabaseClient
                     .from('transacoes')
                     .select('valor, tipo')
                     .eq('lojista_id', lojistaId)
-                    .gte('data_hora', `${hoje}T00:00:00Z`);
+                    .gte('data_hora', dataInicio.toISOString())
+                    .lte('data_hora', dataFim.toISOString());
 
                 let totalVendido = 0;
                 let totalRecebido = 0;
@@ -424,7 +429,6 @@
             document.getElementById('total-geral-receber').innerText = `R$ ${totalGeralDevedor.toFixed(2).replace('.', ',')}`;
         }
 
-        // FUNÇÕES DE EXIBIÇÃO: VENDA
         function abrirFormularioVenda() {
             fecharFormularioCliente(); 
             fecharFormularioPagamento();
@@ -443,7 +447,6 @@
             document.getElementById('desc-venda').value = '';
         }
 
-        // FUNÇÕES DE EXIBIÇÃO: PAGAMENTO
         function abrirFormularioPagamento() {
             fecharFormularioCliente();
             fecharFormularioVenda();
@@ -457,7 +460,6 @@
             document.getElementById('desc-pagamento').value = '';
         }
 
-        // FUNÇÕES DE EXIBIÇÃO: CLIENTE
         function abrirFormularioCliente() {
             fecharFormularioVenda(); 
             fecharFormularioPagamento();
@@ -472,7 +474,6 @@
             document.getElementById('limite-cliente').value = '';
         }
 
-        // FUNÇÃO PARA SALVAR VENDA
         async function salvarVenda() {
             const clienteSelecionado = document.getElementById('select-cliente').value;
             const valor = document.getElementById('valor-venda').value;
@@ -505,7 +506,6 @@
             }
         }
 
-        // FUNÇÃO PARA SALVAR PAGAMENTO (NOVA)
         async function salvarPagamento() {
             const clienteSelecionado = document.getElementById('select-cliente-pagamento').value;
             const valor = document.getElementById('valor-pagamento').value;
@@ -522,7 +522,7 @@
                     .insert([{
                         cliente_id: clienteSelecionado,
                         lojista_id: lojistaId,
-                        tipo: 'pagamento', // Mudança para o tipo 'pagamento'
+                        tipo: 'pagamento',
                         valor: parseFloat(valor),
                         descricao: descricao || 'Pagamento recebido'
                     }]);
@@ -531,14 +531,13 @@
                 
                 alert('Pagamento registrado com sucesso! 💰');
                 fecharFormularioPagamento();
-                carregarPainelLojista(); // Recarrega os valores da tela
+                carregarPainelLojista(); 
             } catch(e) {
                 alert('Erro ao salvar no banco. Salvando localmente para teste!');
                 fecharFormularioPagamento();
             }
         }
 
-        // FUNÇÃO PARA SALVAR CLIENTE
         async function salvarCliente() {
             const nome = document.getElementById('nome-cliente').value;
             const telefone = document.getElementById('tel-cliente').value;
@@ -570,21 +569,17 @@
             }
         }
 
-        // EVENTOS INICIAIS
         document.addEventListener('DOMContentLoaded', () => {
             carregarPainelLojista();
             
-            // Eventos Venda
             document.getElementById('acao-nova-venda').onclick = abrirFormularioVenda;
             document.getElementById('btn-cancelar-venda').onclick = fecharFormularioVenda;
             document.getElementById('btn-salvar-venda').onclick = salvarVenda;
 
-            // Eventos Pagamento
             document.getElementById('acao-novo-pagamento').onclick = abrirFormularioPagamento;
             document.getElementById('btn-cancelar-pagamento').onclick = fecharFormularioPagamento;
-            document.getElementById('btn-salvar-pagamento').onclick = salvarPagamento; // Ativação do evento de salvar
+            document.getElementById('btn-salvar-pagamento').onclick = salvarPagamento; 
 
-            // Eventos Cliente
             document.getElementById('acao-novo-cliente').onclick = abrirFormularioCliente;
             document.getElementById('btn-cancelar-cliente').onclick = fecharFormularioCliente;
             document.getElementById('btn-salvar-cliente').onclick = salvarCliente;
