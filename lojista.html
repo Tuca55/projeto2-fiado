@@ -64,25 +64,40 @@
         .summary-value.positive { color: #28a745; }
         .summary-value.negative { color: #dc3545; }
 
-        .action-button {
-            display: block;
-            width: 100%;
-            padding: 15px;
+        /* AJUSTE DOS BOTÕES DE AÇÕES RÁPIDAS PARA O ESTILO DOS CARDS */
+        .actions-container {
+            display: flex;
+            gap: 10px;
             margin-bottom: 15px;
+            flex-wrap: wrap; 
+        }
+        .actions-container button {
+            flex: 1; 
+            min-width: 120px;
+            padding: 12px 10px;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
+            border-radius: 6px;
+            font-size: 0.95em;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
             text-align: center;
             text-decoration: none;
             color: #fff;
+            box-sizing: border-box;
+            transition: background-color 0.2s ease;
         }
-        .action-button.primary { background-color: #007bff; }
-        .action-button.primary:hover { background-color: #0056b3; }
-        .action-button.secondary { background-color: #6c757d; }
-        .action-button.secondary:hover { background-color: #5a6268; }
+        #acao-nova-venda { background-color: #28a745; }
+        #acao-nova-venda:hover { background-color: #218838; }
+        
+        #acao-novo-pagamento { background-color: #007bff; }
+        #acao-novo-pagamento:hover { background-color: #0056b3; }
+        
+        #acao-novo-cliente { 
+            flex: 100%; /* Ocupa a linha de baixo sozinho igual ao botão compartilhar */
+            background-color: #17a2b8;
+            margin-top: 2px;
+        }
+        #acao-novo-cliente:hover { background-color: #138496; }
 
         .client-card {
             background-color: #f8f9fa;
@@ -113,15 +128,14 @@
             color: #666;
         }
         
-        /* AJUSTE DOS BOTÕES */
         .client-actions {
             display: flex;
             gap: 10px;
             margin-top: 10px;
-            flex-wrap: wrap; /* Permite quebrar linha para o botão de baixo */
+            flex-wrap: wrap; 
         }
         .client-actions a, .client-actions button {
-            flex: 1; /* Faz os botões dividirem o espaço igualmente */
+            flex: 1; 
             min-width: 120px;
             padding: 10px;
             border: none;
@@ -139,9 +153,8 @@
         .client-actions .btn-vender { background-color: #28a745; }
         .client-actions .btn-vender:hover { background-color: #218838; }
         
-        /* Botão de compartilhar ocupando a linha de baixo */
         .client-actions .btn-compartilhar { 
-            flex: 100%; /* Força a ocupar 100% da largura */
+            flex: 100%; 
             background-color: #17a2b8;
             margin-top: 2px;
         }
@@ -182,9 +195,11 @@
         </div>
 
         <h2>⚡ AÇÕES RÁPIDAS</h2>
-        <button class="action-button primary" id="acao-nova-venda">➕ Nova Venda no Fiado</button>
-        <button class="action-button secondary" id="acao-novo-pagamento" style="background-color: #007bff;">💰 Registrar Pagamento</button>
-        <button class="action-button secondary" id="acao-novo-cliente">👤 Cadastrar Novo Cliente</button>
+        <div class="actions-container">
+            <button id="acao-nova-venda">➕ Nova Venda</button>
+            <button id="acao-novo-pagamento">💰 Pagamento</button>
+            <button id="acao-novo-cliente">👤 Cadastrar Novo Cliente</button>
+        </div>
 
         <div id="form-nova-venda" style="display: none; background-color: #e9f7ee; border: 1px solid #c3e6cb; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
             <h3 style="margin-top: 0; color: #155724;">📝 Lançar Nova Venda</h3>
@@ -340,13 +355,11 @@
             let totalGeralDevedor = 0;
 
             for (const cliente of clientes) {
-                // Preenche o select de Venda
                 const optionVenda = document.createElement('option');
                 optionVenda.value = cliente.id;
                 optionVenda.innerText = cliente.nome;
                 selectCliente.appendChild(optionVenda);
 
-                // Preenche o select de Pagamento (Novo)
                 const optionPagamento = document.createElement('option');
                 optionPagamento.value = cliente.id;
                 optionPagamento.innerText = cliente.nome;
@@ -384,7 +397,6 @@
                 const card = document.createElement('div');
                 card.className = 'client-card';
                 
-                // Mensagens para o WhatsApp
                 const msgZapCobrar = encodeURIComponent(`Olá, ${cliente.nome}! Passando para lembrar que sua conta no ${nomeLoja} está em R$ ${saldoDevedor.toFixed(2).replace('.', ',')}. Segue a chave PIX: ${chavePix}. Obrigado!`);
                 const linkDoCliente = `https://tuca55.github.io/projeto2-fiado/consumidor.html?id=${cliente.id}`;
                 const msgZapLink = encodeURIComponent(`Olá, ${cliente.nome}! Para acompanhar suas compras e saldo atualizado da sua conta no ${nomeLoja}, basta acessar este link: ${linkDoCliente}`);
@@ -431,7 +443,7 @@
             document.getElementById('desc-venda').value = '';
         }
 
-        // FUNÇÕES DE EXIBIÇÃO: PAGAMENTO (NOVO)
+        // FUNÇÕES DE EXIBIÇÃO: PAGAMENTO
         function abrirFormularioPagamento() {
             fecharFormularioCliente();
             fecharFormularioVenda();
@@ -534,10 +546,9 @@
             document.getElementById('btn-cancelar-venda').onclick = fecharFormularioVenda;
             document.getElementById('btn-salvar-venda').onclick = salvarVenda;
 
-            // Eventos Pagamento (Novo)
+            // Eventos Pagamento
             document.getElementById('acao-novo-pagamento').onclick = abrirFormularioPagamento;
             document.getElementById('btn-cancelar-pagamento').onclick = fecharFormularioPagamento;
-            // O botão de salvar pagamento ainda não tem função vinculada (faremos no Passo 3)
 
             // Eventos Cliente
             document.getElementById('acao-novo-cliente').onclick = abrirFormularioCliente;
