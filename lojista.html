@@ -154,13 +154,13 @@
         <h1>CADERNETA DE FIADO</h1>
         <p class="greeting" id="boas-vindas">Carregando loja...</p>
 
-        <h2>📊 RESUMO DE HOJE</h2>
+        <h2>📊 RESUMO FINANCEIRO</h2>
         <div class="summary-item">
-            <span>Total Vendido no Fiado:</span>
+            <span>Vendido Hoje (Fiado):</span>
             <span class="summary-value positive" id="vendido-hoje">R$ 0,00</span>
         </div>
         <div class="summary-item">
-            <span>Total Recebido:</span>
+            <span>Recebido Hoje:</span>
             <span class="summary-value positive" id="recebido-hoje">R$ 0,00</span>
         </div>
         <div class="summary-item" style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 5px;">
@@ -245,7 +245,7 @@
                 if (erroLoja) throw erroLoja;
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
 
-                // 2. BUSCA AS TRANSAÇÕES DE HOJE PARA OS TOTAIS
+                // 2. Busca as transações de hoje para os totais diários
                 const hoje = new Date().toISOString().split('T')[0]; 
                 
                 const { data: transacoesHoje, error: erroTransHoje } = await supabaseClient
@@ -275,14 +275,13 @@
 
                 if (erroClientes) throw erroClientes;
 
+                // Passa os clientes para serem desenhados na tela e faz a soma geral
                 renderizarClientes(clientes, loja.nome_comercial, loja.chave_pix);
 
             } catch (error) {
                 console.error("Falha na conexão real. Ativando modo de simulação...", error);
                 
                 document.getElementById('boas-vindas').innerText = `Olá, Lojista (Modo Simulação)! 👋`;
-                document.getElementById('vendido-hoje').innerText = "R$ 0,00";
-                document.getElementById('recebido-hoje').innerText = "R$ 0,00";
                 
                 const clientesFalsos = [
                     {id: '1', nome: 'Cliente Teste 1', telefone: '5511999999999', limite_total: 100},
@@ -304,8 +303,7 @@
                 return;
             }
 
-            // AJUSTE NOVO: Variável para acumular a soma do fiado de todos os clientes
-            let totalGeralDevedor = 0;
+            let totalGeralDevedor = 0; // Variável para acumular a soma de todos
 
             for (const cliente of clientes) {
                 const option = document.createElement('option');
@@ -328,10 +326,10 @@
                         });
                     }
                 } catch(e) { 
-                    saldoDevedor = 30.00; // Simulação se falhar
+                    saldoDevedor = 0; 
                 }
 
-                // AJUSTE NOVO: Só acumula valores positivos (para não diminuir se alguém tiver saldo sobrando)
+                // Soma o saldo deste cliente ao total geral
                 if (saldoDevedor > 0) {
                     totalGeralDevedor += saldoDevedor;
                 }
@@ -361,7 +359,7 @@
                 containerClientes.appendChild(card);
             }
 
-            // AJUSTE NOVO: Atualiza o campo lá em cima no Resumo com a soma total
+            // Atualiza o campo novo na tela com o total de tudo
             document.getElementById('total-geral-receber').innerText = `R$ ${totalGeralDevedor.toFixed(2).replace('.', ',')}`;
         }
 
