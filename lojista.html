@@ -116,9 +116,11 @@
             display: flex;
             gap: 10px;
             margin-top: 10px;
+            flex-wrap: wrap; /* Permite que os botões quebrem linha se necessário */
         }
         .client-actions a, .client-actions button {
             flex: 1;
+            min-width: 120px; /* Garante tamanho mínimo para os botões de cima */
             padding: 10px;
             border: none;
             border-radius: 6px;
@@ -133,6 +135,14 @@
         .client-actions .btn-cobrar:hover { background-color: #0056b3; }
         .client-actions .btn-vender { background-color: #28a745; }
         .client-actions .btn-vender:hover { background-color: #218838; }
+        
+        /* Ajuste do botão novo de compartilhar link */
+        .client-actions .btn-compartilhar { 
+            flex: 100%; /* Faz o botão ocupar toda a largura de baixo */
+            background-color: #17a2b8;
+            margin-top: 5px;
+        }
+        .client-actions .btn-compartilhar:hover { background-color: #138496; }
 
         .menu-footer {
             margin-top: 30px;
@@ -226,6 +236,7 @@
         
         let supabaseClient;
         const lojistaId = '00000000-0000-0000-0000-000000000001'; 
+        let nomeDaLojaGlobal = "Minha Loja";
 
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -235,7 +246,6 @@
 
         async function carregarPainelLojista() {
             try {
-                // 1. Busca dados da Loja
                 const { data: loja, error: erroLoja } = await supabaseClient
                     .from('lojistas')
                     .select('*')
@@ -244,8 +254,8 @@
 
                 if (erroLoja) throw erroLoja;
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
+                nomeDaLojaGlobal = loja.nome_comercial;
 
-                // 2. BUSCA AS TRANSAÇÕES DE HOJE PARA OS TOTAIS
                 const hoje = new Date().toISOString().split('T')[0]; 
                 
                 const { data: transacoesHoje, error: erroTransHoje } = await supabaseClient
@@ -267,7 +277,6 @@
                 document.getElementById('vendido-hoje').innerText = `R$ ${totalVendido.toFixed(2).replace('.', ',')}`;
                 document.getElementById('recebido-hoje').innerText = `R$ ${totalRecebido.toFixed(2).replace('.', ',')}`;
 
-                // 3. Busca clientes
                 const { data: clientes, error: erroClientes } = await supabaseClient
                     .from('clientes')
                     .select('*')
@@ -281,8 +290,6 @@
                 console.error("Falha na conexão real. Ativando modo de simulação...", error);
                 
                 document.getElementById('boas-vindas').innerText = `Olá, Lojista (Modo Simulação)! 👋`;
-                document.getElementById('vendido-hoje').innerText = "R$ 0,00";
-                document.getElementById('recebido-hoje').innerText = "R$ 0,00";
                 
                 const clientesFalsos = [
                     {id: '1', nome: 'Cliente Teste 1', telefone: '5511999999999', limite_total: 100},
@@ -304,7 +311,6 @@
                 return;
             }
 
-            // AJUSTE NOVO: Variável para acumular a soma do fiado de todos os clientes
             let totalGeralDevedor = 0;
 
             for (const cliente of clientes) {
@@ -328,10 +334,9 @@
                         });
                     }
                 } catch(e) { 
-                    saldoDevedor = 30.00; // Simulação se falhar
+                    saldoDevedor = 30.00; 
                 }
 
-                // AJUSTE NOVO: Só acumula valores positivos (para não diminuir se alguém tiver saldo sobrando)
                 if (saldoDevedor > 0) {
                     totalGeralDevedor += saldoDevedor;
                 }
@@ -346,7 +351,12 @@
                 const card = document.createElement('div');
                 card.className = 'client-card';
                 
-                const msgZap = encodeURIComponent(`Olá, ${cliente.nome}! Passando para lembrar que sua conta no ${nomeLoja} está em R$ ${saldoDevedor.toFixed(2).replace('.', ',')}. Segue a chave PIX: ${chavePix}. Obrigado!`);
+                // Mensagem padrão para cobrar a dívida
+                const msgZapCobrar = encodeURIComponent(`Olá, ${cliente.nome}! Passando para lembrar que sua conta no ${nomeLoja} está em R$ ${saldoDevedor.toFixed(2).replace('.', ',')}. Segue a chave PIX: ${chavePix}. Obrigado!`);
+                
+                // ATENÇÃO: Troque "SEU-USUARIO" pelo seu login real do GitHub
+                const linkDoCliente = `https://SEU-USUARIO.github.io/projeto-fiado/cliente.html?id=${cliente.id}`;
+                const msgZapLink = encodeURIComponent(`Olá, ${cliente.nome}! Para acompanhar suas compras e saldo atualizado da sua conta no ${nomeLoja}, basta acessar este link: ${linkDoCliente}`);
 
                 card.innerHTML = `
                     <span class="client-name">${cliente.nome}</span>
@@ -354,14 +364,15 @@
                     <span class="client-details">Deve: R$ ${saldoDevedor.toFixed(2).replace('.', ',')}</span>
                     <span class="client-details">Limite Restante: R$ ${limiteDisponivel.toFixed(2).replace('.', ',')}</span>
                     <div class="client-actions">
-                        ${saldoDevedor > 0 ? `<a href="https://wa.me/${cliente.telefone}?text=${msgZap}" target="_blank" class="btn-cobrar">Cobrar no WhatsApp</a>` : ''}
+                        ${saldoDevedor > 0 ? `<a href="https://wa.me/${cliente.telefone}?text=${msgZapCobrar}" target="_blank" class="btn-cobrar">Cobrar no WhatsApp</a>` : ''}
                         <button class="btn-vender" onclick="abrirFormularioVendaRapida('${cliente.id}')">Lançar Venda</button>
+                        
+                        <a href="https://wa.me/${cliente.telefone}?text=${msgZapLink}" target="_blank" class="btn-compartilhar">🔗 Compartilhar Link</a>
                     </div>
                 `;
                 containerClientes.appendChild(card);
             }
 
-            // AJUSTE NOVO: Atualiza o campo lá em cima no Resumo com a soma total
             document.getElementById('total-geral-receber').innerText = `R$ ${totalGeralDevedor.toFixed(2).replace('.', ',')}`;
         }
 
@@ -380,6 +391,19 @@
             document.getElementById('form-nova-venda').style.display = 'none';
             document.getElementById('valor-venda').value = '';
             document.getElementById('desc-venda').value = '';
+        }
+
+        function abrirFormularioCliente() {
+            fecharFormularioVenda(); 
+            document.getElementById('form-novo-cliente').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function fecharFormularioCliente() {
+            document.getElementById('form-novo-cliente').style.display = 'none';
+            document.getElementById('nome-cliente').value = '';
+            document.getElementById('tel-cliente').value = '';
+            document.getElementById('limite-cliente').value = '';
         }
 
         async function salvarVenda() {
@@ -412,19 +436,6 @@
                 alert('Erro ao salvar no banco. Salvando localmente para teste!');
                 fecharFormularioVenda();
             }
-        }
-
-        function abrirFormularioCliente() {
-            fecharFormularioVenda(); 
-            document.getElementById('form-novo-cliente').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function fecharFormularioCliente() {
-            document.getElementById('form-novo-cliente').style.display = 'none';
-            document.getElementById('nome-cliente').value = '';
-            document.getElementById('tel-cliente').value = '';
-            document.getElementById('limite-cliente').value = '';
         }
 
         async function salvarCliente() {
