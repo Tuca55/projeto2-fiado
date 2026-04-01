@@ -62,6 +62,7 @@
             color: #333;
         }
         .summary-value.positive { color: #28a745; }
+        .summary-value.negative { color: #dc3545; }
 
         .action-button {
             display: block;
@@ -162,6 +163,10 @@
             <span>Total Recebido:</span>
             <span class="summary-value positive" id="recebido-hoje">R$ 0,00</span>
         </div>
+        <div class="summary-item" style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 5px;">
+            <span style="font-weight: 600; color: #333;">Total Geral a Receber:</span>
+            <span class="summary-value negative" id="total-geral-receber">R$ 0,00</span>
+        </div>
 
         <h2>⚡ AÇÕES RÁPIDAS</h2>
         <button class="action-button primary" id="acao-nova-venda">➕ Nova Venda no Fiado</button>
@@ -240,7 +245,7 @@
                 if (erroLoja) throw erroLoja;
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
 
-                // 2. BUSCA AS TRANSAÇÕES DE HOJE PARA OS TOTAIS (AJUSTE NOVO)
+                // 2. BUSCA AS TRANSAÇÕES DE HOJE PARA OS TOTAIS
                 const hoje = new Date().toISOString().split('T')[0]; 
                 
                 const { data: transacoesHoje, error: erroTransHoje } = await supabaseClient
@@ -299,6 +304,9 @@
                 return;
             }
 
+            // AJUSTE NOVO: Variável para acumular a soma do fiado de todos os clientes
+            let totalGeralDevedor = 0;
+
             for (const cliente of clientes) {
                 const option = document.createElement('option');
                 option.value = cliente.id;
@@ -321,6 +329,11 @@
                     }
                 } catch(e) { 
                     saldoDevedor = 30.00; // Simulação se falhar
+                }
+
+                // AJUSTE NOVO: Só acumula valores positivos (para não diminuir se alguém tiver saldo sobrando)
+                if (saldoDevedor > 0) {
+                    totalGeralDevedor += saldoDevedor;
                 }
 
                 const limiteDisponivel = parseFloat(cliente.limite_total) - saldoDevedor;
@@ -347,6 +360,9 @@
                 `;
                 containerClientes.appendChild(card);
             }
+
+            // AJUSTE NOVO: Atualiza o campo lá em cima no Resumo com a soma total
+            document.getElementById('total-geral-receber').innerText = `R$ ${totalGeralDevedor.toFixed(2).replace('.', ',')}`;
         }
 
         function abrirFormularioVenda() {
