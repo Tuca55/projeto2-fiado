@@ -222,7 +222,6 @@
         let supabaseClient;
         const lojistaId = '00000000-0000-0000-0000-000000000001'; 
 
-        // Tenta conectar, se falhar, avisa no console
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch(e) {
@@ -231,7 +230,7 @@
 
         async function carregarPainelLojista() {
             try {
-                // Tenta carregar dados da Loja
+                // 1. Busca dados da Loja
                 const { data: loja, error: erroLoja } = await supabaseClient
                     .from('lojistas')
                     .select('*')
@@ -241,7 +240,29 @@
                 if (erroLoja) throw erroLoja;
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
 
-                // Tenta carregar clientes
+                // 2. BUSCA AS TRANSAÇÕES DE HOJE PARA OS TOTAIS (AJUSTE NOVO)
+                const hoje = new Date().toISOString().split('T')[0]; 
+                
+                const { data: transacoesHoje, error: erroTransHoje } = await supabaseClient
+                    .from('transacoes')
+                    .select('valor, tipo')
+                    .eq('lojista_id', lojistaId)
+                    .gte('data_hora', `${hoje}T00:00:00Z`);
+
+                let totalVendido = 0;
+                let totalRecebido = 0;
+
+                if (!erroTransHoje && transacoesHoje) {
+                    transacoesHoje.forEach(t => {
+                        if (t.tipo === 'venda') totalVendido += parseFloat(t.valor);
+                        if (t.tipo === 'pagamento') totalRecebido += parseFloat(t.valor);
+                    });
+                }
+
+                document.getElementById('vendido-hoje').innerText = `R$ ${totalVendido.toFixed(2).replace('.', ',')}`;
+                document.getElementById('recebido-hoje').innerText = `R$ ${totalRecebido.toFixed(2).replace('.', ',')}`;
+
+                // 3. Busca clientes
                 const { data: clientes, error: erroClientes } = await supabaseClient
                     .from('clientes')
                     .select('*')
@@ -254,8 +275,9 @@
             } catch (error) {
                 console.error("Falha na conexão real. Ativando modo de simulação...", error);
                 
-                // MODO DE EMERGÊNCIA/SIMULAÇÃO: Carrega dados fictícios para a página não travar
                 document.getElementById('boas-vindas').innerText = `Olá, Lojista (Modo Simulação)! 👋`;
+                document.getElementById('vendido-hoje').innerText = "R$ 0,00";
+                document.getElementById('recebido-hoje').innerText = "R$ 0,00";
                 
                 const clientesFalsos = [
                     {id: '1', nome: 'Cliente Teste 1', telefone: '5511999999999', limite_total: 100},
@@ -283,7 +305,7 @@
                 option.innerText = cliente.nome;
                 selectCliente.appendChild(option);
 
-                let saldoDevedor = 30.00; // Valor fixo simulado caso falhe a busca de transações
+                let saldoDevedor = 0; 
                 
                 try {
                     const { data: transacoesCliente } = await supabaseClient
@@ -292,13 +314,14 @@
                         .eq('cliente_id', cliente.id);
 
                     if (transacoesCliente) {
-                        saldoDevedor = 0;
                         transacoesCliente.forEach(t => {
                             if (t.tipo === 'venda') saldoDevedor += parseFloat(t.valor);
                             if (t.tipo === 'pagamento') saldoDevedor -= parseFloat(t.valor);
                         });
                     }
-                } catch(e) { /* Segue com o valor simulado */ }
+                } catch(e) { 
+                    saldoDevedor = 30.00; // Simulação se falhar
+                }
 
                 const limiteDisponivel = parseFloat(cliente.limite_total) - saldoDevedor;
                 let statusClasse = 'ok';
@@ -326,7 +349,6 @@
             }
         }
 
-        // Funções do Formulário de Venda
         function abrirFormularioVenda() {
             fecharFormularioCliente(); 
             document.getElementById('form-nova-venda').style.display = 'block';
@@ -376,7 +398,6 @@
             }
         }
 
-        // Funções do Formulário de Cadastro de Cliente
         function abrirFormularioCliente() {
             fecharFormularioVenda(); 
             document.getElementById('form-novo-cliente').style.display = 'block';
@@ -421,7 +442,6 @@
             }
         }
 
-        // Atribuição dos eventos (CLIQUES) garantidos
         document.addEventListener('DOMContentLoaded', () => {
             carregarPainelLojista();
             
