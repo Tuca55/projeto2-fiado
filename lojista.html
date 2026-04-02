@@ -272,7 +272,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
         
         let supabaseClient;
-        const lojistaId = '00000000-0000-0000-0000-000000000001'; 
+        let lojistaId = ''; // REMOVIDO ID FIXO! Começa vazio.
         let nomeDaLojaGlobal = "Minha Loja";
 
         try {
@@ -281,8 +281,24 @@
             console.error("Erro ao iniciar Supabase:", e);
         }
 
+        // NOVA FUNÇÃO: Pega o ID que está no link da barra de endereço
+        function obterLojistaIdDaURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
         async function carregarPainelLojista() {
             try {
+                // Descobre quem é o lojista pelo link
+                lojistaId = obterLojistaIdDaURL();
+
+                // Se não houver ID no link, avisa e para o sistema
+                if (!lojistaId) {
+                    document.getElementById('boas-vindas').innerText = `Erro: Link inválido ou ID do lojista ausente!`;
+                    document.getElementById('lista-clientes').innerHTML = '<p style="text-align: center; color: #dc3545;">Acesse o sistema usando o link completo da sua loja.</p>';
+                    return;
+                }
+
                 const { data: loja, error: erroLoja } = await supabaseClient
                     .from('lojistas')
                     .select('*')
@@ -293,7 +309,6 @@
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
                 nomeDaLojaGlobal = loja.nome_comercial;
 
-                // AJUSTE: Filtrar vendas de hoje (definindo o fuso com início às 00:00:00 e fim às 23:59:59)
                 const dataInicio = new Date();
                 dataInicio.setHours(0,0,0,0);
                 
@@ -331,7 +346,6 @@
 
             } catch (error) {
                 console.error("Falha na conexão real. Ativando modo de simulação...", error);
-                
                 document.getElementById('boas-vindas').innerText = `Olá, Lojista (Modo Simulação)! 👋`;
                 
                 const clientesFalsos = [
