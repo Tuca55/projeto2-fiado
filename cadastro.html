@@ -85,6 +85,24 @@
         .link-gerado:hover {
             text-decoration: underline;
         }
+        
+        /* ESTILO PARA O BOTÃO DO WHATSAPP */
+        .btn-whatsapp {
+            display: block;
+            text-align: center;
+            background-color: #25d366;
+            color: white;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1em;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+        }
+        .btn-whatsapp:hover {
+            background-color: #128c7e;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
 </head>
@@ -97,19 +115,22 @@
         <label for="nome-loja">Nome da Loja / Comercial:</label>
         <input type="text" id="nome-loja" placeholder="Ex: Mercadinho do bairro" required>
 
-        <label for="tel-loja">WhatsApp do Lojista:</label>
+        <label for="tel-loja">Seu WhatsApp (com DDD):</label>
         <input type="text" id="tel-loja" placeholder="Ex: 5511999999999" required>
 
         <label for="pix-loja">Chave PIX para Receber:</label>
-        <input type="text" id="pix-loja" placeholder="E-mail, CPF, CNPJ ou Telemóvel" required>
+        <input type="text" id="pix-loja" placeholder="E-mail, CPF, CNPJ ou Celular" required>
 
         <button id="btn-cadastrar">Cadastrar Minha Loja 🚀</button>
 
         <div id="resultado">
             <p style="margin-top: 0; color: #155724; font-weight: bold;">🎉 Loja cadastrada com sucesso!</p>
-            <p style="font-size: 0.9em; color: #555;">Guarde bem o seu link de acesso exclusivo:</p>
+            <p style="font-size: 0.9em; color: #555;">Toque no botão abaixo para salvar o link de acesso direto nas suas conversas do WhatsApp:</p>
+            
+            <a href="#" id="link-zap" class="btn-whatsapp" target="_blank">📲 Salvar Link no meu WhatsApp</a>
+
+            <p style="font-size: 0.8em; color: #888; margin-top: 15px; text-align: center;">Ou copie o link por aqui se preferir:</p>
             <a href="#" id="link-acesso" class="link-gerado" target="_blank"></a>
-            <p style="font-size: 0.8em; color: #888; margin-top: 15px;">Dica: Guarde este link nos favoritos do seu telemóvel!</p>
         </div>
     </div>
 
@@ -126,7 +147,8 @@
 
         async function cadastrarLoja() {
             const nome = document.getElementById('nome-loja').value;
-            const telefone = document.getElementById('tel-loja').value;
+            // Remove espaços ou traços que o usuário possa digitar no telefone
+            const telefone = document.getElementById('tel-loja').value.replace(/\D/g, '');
             const pix = document.getElementById('pix-loja').value;
 
             if (!nome || !telefone || !pix) {
@@ -135,7 +157,6 @@
             }
 
             try {
-                // Insere a nova loja na tabela 'lojistas'
                 const { data, error } = await supabaseClient
                     .from('lojistas')
                     .insert([{
@@ -148,23 +169,29 @@
 
                 if (error) throw error;
 
-                // Constrói o link do painel usando o ID gerado pelo Supabase
-                // ATENÇÃO: Se o seu ficheiro principal tiver outro nome (como index.html), mude aqui em baixo!
+                // Constrói o link do painel
                 const linkFinal = `${window.location.origin}${window.location.pathname.replace('cadastro.html', 'lojista.html')}?id=${data.id}`;
 
-                // Exibe o resultado e o link no ecrã
+                // Cria a mensagem codificada para o WhatsApp
+                const mensagemZap = encodeURIComponent(`Olá! Este é o seu link exclusivo de acesso ao Sistema de Fiado do(a) *${nome}*.\n\nGuarde bem esta mensagem para acessar o painel sempre que precisar:\n\n${linkFinal}`);
+                
+                // Monta o link da API do WhatsApp direcionado para o número do lojista
+                const linkApiWhatsApp = `https://wa.me/${telefone}?text=${mensagemZap}`;
+
+                // Atualiza a interface
+                document.getElementById('link-zap').href = linkApiWhatsApp;
                 document.getElementById('link-acesso').href = linkFinal;
                 document.getElementById('link-acesso').innerText = linkFinal;
                 document.getElementById('resultado').style.display = 'block';
 
-                // Limpa os campos do formulário
+                // Limpa os campos
                 document.getElementById('nome-loja').value = '';
                 document.getElementById('tel-loja').value = '';
                 document.getElementById('pix-loja').value = '';
 
             } catch(e) {
                 console.error(e);
-                alert('Erro ao cadastrar a loja. Verifique a consola.');
+                alert('Erro ao cadastrar a loja. Verifique a tabela no banco.');
             }
         }
 
