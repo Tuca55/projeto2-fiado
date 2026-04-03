@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Anúncios</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 500px;
+            padding: 25px;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+        }
+        .campo {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+            font-family: inherit;
+        }
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #mensagem {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📢 Atualizar Anúncio</h1>
+        
+        <div class="campo">
+            <label for="titulo">Título do Anúncio (Ex: Desejo do dia: Açaí!):</label>
+            <input type="text" id="titulo" placeholder="Digite o título chamativo...">
+        </div>
+
+        <div class="campo">
+            <label for="descricao">Descrição (A copy que criamos):</label>
+            <textarea id="descricao" placeholder="Escreva os detalhes do produto..."></textarea>
+        </div>
+
+        <div class="campo">
+            <label for="preco">Preço (Ex: R$ 16,00 o litro):</label>
+            <input type="text" id="preco" placeholder="Digite o valor ou promoção...">
+        </div>
+
+        <div class="campo">
+            <label for="link">Link da Shopee ou WhatsApp:</label>
+            <input type="text" id="link" placeholder="https://...">
+        </div>
+
+        <button id="btn-salvar">Salvar Novo Anúncio</button>
+        
+        <p id="mensagem"></p>
+    </div>
+
+    <script>
+        // Suas credenciais do Supabase
+        const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Carregar o anúncio atual quando a página abrir
+        async function carregarAnuncioAtual() {
+            const { data, error } = await supabaseClient
+                .from('anuncios')
+                .select('*')
+                .eq('id', 1)
+                .single();
+
+            if (data) {
+                document.getElementById('titulo').value = data.titulo || '';
+                document.getElementById('descricao').value = data.descricao || '';
+                document.getElementById('preco').value = data.preco || '';
+                document.getElementById('link').value = data.link || '';
+            }
+        }
