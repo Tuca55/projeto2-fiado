@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Transações - Projeto Fiado</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 500px;
+            padding: 25px;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+        }
+        .voltar-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        .voltar-link:hover { text-decoration: underline; }
+
+        .transacao-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95em;
+        }
+        .transacao-item:last-child { border-bottom: none; }
+
+        .info-esquerda {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .nome-cliente {
+            font-weight: 700;
+            color: #333;
+        }
+        .descricao {
+            font-size: 0.85em;
+            color: #777;
+        }
+        .data {
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        .valor {
+            font-weight: 700;
+            font-size: 1.05em;
+        }
+        .valor.venda { color: #dc3545; } /* Vermelho para dívida */
+        .valor.pagamento { color: #28a745; } /* Verde para pagamento */
+
+        .sem-dados {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <a href="#" id="btn-voltar" class="voltar-link">⬅️ Voltar para o Painel</a>
+        <h1>🗓️ Histórico de Movimentações</h1>
+
+        <div id="lista-historico">
+            <p style="text-align: center; color: #888;">Carregando histórico...</p>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
+        
+        let supabaseClient;
+        let lojistaId = '';
+
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch(e) {
+            console.error("Erro ao iniciar Supabase:", e);
+        }
+
+        function obterLojistaIdDaURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        async function carregarHistorico() {
+            lojistaId = obterLojistaIdDaURL();
+            
+            if (!lojistaId) {
+                document.getElementById('lista-historico').innerHTML = '<p class="sem-dados">Erro: ID do lojista ausente.</p>';
+                return;
+            }
+
+            // Ajusta o link de voltar para manter o ID do lojista
+            document.getElementById('btn-voltar').href = `lojista.html?id=${lojistaId}`;
+
+            try {
+                // Procuramos as transações ordenadas pela data mais recente
+                const { data: transacoes, error } = await supabaseClient
+                    .from('transacoes')
+                    .select(`
+                        valor,
+                        tipo,
+                        descricao,
+                        data_hora,
+                        clientes ( nome )
+                    `)
+                    .eq('lojista_id', lojistaId)
+                    .order('data_hora', { ascending: false });
+
+                if (error) throw error;
+
+                const container = document.getElementById('lista-historico');
+                container.innerHTML = '';
+
+                if (!transacoes || transacoes.length === 0) {
+                    container.innerHTML = '<p class="sem-dados">Nenhuma movimentação registrada ainda.</p>';
+                    return;
+                }
+
+                transacoes.forEach(trans => {
+                    const item = document.createElement('div');
+                    item.className = 'transacao-item';
+
+                    // Formatar a data para algo legível (Ex: 03/04 às 11:30)
+                    const dataObj = new Date(trans.data_hora);
+                    const dataFormatada = dataObj.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'});
+                    const horaFormatada = dataObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+
+                    const sinal = trans.tipo === 'venda' ? '+' : '-';
+                    const classeValor = trans.tipo === 'venda' ? 'venda' : 'pagamento';
+                    const nomeCliente = trans.clientes ? trans.clientes.nome : 'Cliente Removido';
+
+                    item.innerHTML = `
+                        <div class="info-esquerda">
+                            <span class="nome-cliente">${nomeCliente}</span>
+                            <span class="descricao">${trans.descricao || (trans.tipo === 'venda' ? 'Venda' : 'Pagamento')}</span>
+                            <span class="data">${dataFormatada} às ${horaFormatada}</span>
+                        </div>
+                        <div class="valor ${classeValor}">
+                            ${sinal} R$ ${parseFloat(trans.valor).toFixed(2).replace('.', ',')}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+
+            } catch (e) {
+                console.error(e);
+                document.getElementById('lista-historico').innerHTML = '<p class="sem-dados">Erro ao carregar os dados.</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarHistorico);
+    </script>
+</body>
+</html>
