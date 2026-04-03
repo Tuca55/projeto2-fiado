@@ -168,6 +168,7 @@
             color: #007bff;
             text-decoration: none;
             margin: 0 10px;
+            cursor: pointer;
         }
         .menu-footer a:hover { text-decoration: underline; }
     </style>
@@ -202,17 +203,12 @@
 
         <div id="form-nova-venda" style="display: none; background-color: #e9f7ee; border: 1px solid #c3e6cb; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
             <h3 style="margin-top: 0; color: #155724;">📝 Lançar Nova Venda</h3>
-            
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Cliente:</label>
-            <select id="select-cliente" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc;">
-            </select>
-
+            <select id="select-cliente" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc;"></select>
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Valor (R$):</label>
             <input type="number" id="valor-venda" step="0.01" placeholder="Ex: 15.50" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Descrição (Opcional):</label>
             <input type="text" id="desc-venda" placeholder="Ex: Pão e leite" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
             <div style="display: flex; gap: 10px;">
                 <button id="btn-salvar-venda" style="flex: 2; background-color: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Salvar Fiado</button>
                 <button id="btn-cancelar-venda" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
@@ -221,17 +217,12 @@
 
         <div id="form-novo-pagamento" style="display: none; background-color: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
             <h3 style="margin-top: 0; color: #0d47a1;">💰 Registrar Pagamento</h3>
-            
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Cliente:</label>
-            <select id="select-cliente-pagamento" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc;">
-            </select>
-
+            <select id="select-cliente-pagamento" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc;"></select>
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Valor Pago (R$):</label>
             <input type="number" id="valor-pagamento" step="0.01" placeholder="Ex: 50.00" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Descrição (Opcional):</label>
             <input type="text" id="desc-pagamento" placeholder="Ex: Pagou em dinheiro" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
             <div style="display: flex; gap: 10px;">
                 <button id="btn-salvar-pagamento" style="flex: 2; background-color: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Confirmar Pagamento</button>
                 <button id="btn-cancelar-pagamento" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
@@ -240,19 +231,29 @@
 
         <div id="form-novo-cliente" style="display: none; background-color: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
             <h3 style="margin-top: 0; color: #0d47a1;">👤 Cadastrar Novo Cliente</h3>
-            
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nome do Cliente:</label>
             <input type="text" id="nome-cliente" placeholder="Ex: Dona Maria" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Telefone (WhatsApp):</label>
             <input type="text" id="tel-cliente" placeholder="Ex: 5511999999999" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Limite de Crédito (R$):</label>
             <input type="number" id="limite-cliente" step="0.01" placeholder="Ex: 100.00" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-
             <div style="display: flex; gap: 10px;">
                 <button id="btn-salvar-cliente" style="flex: 2; background-color: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cadastrar Cliente</button>
                 <button id="btn-cancelar-cliente" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
+            </div>
+        </div>
+
+        <div id="form-configuracoes" style="display: none; background-color: #f1f3f5; border: 1px solid #ced4da; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0; color: #495057;">⚙️ Configurações da Loja</h3>
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nome da Loja:</label>
+            <input type="text" id="config-nome-loja" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Seu WhatsApp:</label>
+            <input type="text" id="config-tel-loja" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Sua Chave PIX:</label>
+            <input type="text" id="config-pix-loja" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+            <div style="display: flex; gap: 10px;">
+                <button id="btn-atualizar-config" style="flex: 2; background-color: #495057; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Salvar Alterações</button>
+                <button id="btn-cancelar-config" style="flex: 1; background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
             </div>
         </div>
 
@@ -262,7 +263,7 @@
         </div>
 
         <div class="menu-footer">
-            <a href="#">⚙️ Configurações</a>
+            <a id="link-config">⚙️ Configurações</a>
             <a href="#">🗓️ Histórico Completo</a>
         </div>
     </div>
@@ -272,7 +273,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
         
         let supabaseClient;
-        let lojistaId = ''; // REMOVIDO ID FIXO! Começa vazio.
+        let lojistaId = ''; 
         let nomeDaLojaGlobal = "Minha Loja";
 
         try {
@@ -281,7 +282,6 @@
             console.error("Erro ao iniciar Supabase:", e);
         }
 
-        // NOVA FUNÇÃO: Pega o ID que está no link da barra de endereço
         function obterLojistaIdDaURL() {
             const params = new URLSearchParams(window.location.search);
             return params.get('id');
@@ -289,10 +289,7 @@
 
         async function carregarPainelLojista() {
             try {
-                // Descobre quem é o lojista pelo link
                 lojistaId = obterLojistaIdDaURL();
-
-                // Se não houver ID no link, avisa e para o sistema
                 if (!lojistaId) {
                     document.getElementById('boas-vindas').innerText = `Erro: Link inválido ou ID do lojista ausente!`;
                     document.getElementById('lista-clientes').innerHTML = '<p style="text-align: center; color: #dc3545;">Acesse o sistema usando o link completo da sua loja.</p>';
@@ -309,9 +306,13 @@
                 document.getElementById('boas-vindas').innerText = `Olá, ${loja.nome_comercial}! 👋`;
                 nomeDaLojaGlobal = loja.nome_comercial;
 
+                // Preenche os campos de configuração com os dados atuais do banco
+                document.getElementById('config-nome-loja').value = loja.nome_comercial;
+                document.getElementById('config-tel-loja').value = loja.telefone;
+                document.getElementById('config-pix-loja').value = loja.chave_pix;
+
                 const dataInicio = new Date();
                 dataInicio.setHours(0,0,0,0);
-                
                 const dataFim = new Date();
                 dataFim.setHours(23,59,59,999);
                 
@@ -341,13 +342,11 @@
                     .eq('lojista_id', lojistaId);
 
                 if (erroClientes) throw erroClientes;
-
                 renderizarClientes(clientes, loja.nome_comercial, loja.chave_pix);
 
             } catch (error) {
                 console.error("Falha na conexão real. Ativando modo de simulação...", error);
                 document.getElementById('boas-vindas').innerText = `Olá, Lojista (Modo Simulação)! 👋`;
-                
                 const clientesFalsos = [
                     {id: '1', nome: 'Cliente Teste 1', telefone: '5511999999999', limite_total: 100},
                     {id: '2', nome: 'Cliente Teste 2', telefone: '5511888888888', limite_total: 200}
@@ -359,7 +358,6 @@
         async function renderizarClientes(clientes, nomeLoja, chavePix) {
             const containerClientes = document.getElementById('lista-clientes');
             containerClientes.innerHTML = ''; 
-
             const selectCliente = document.getElementById('select-cliente');
             const selectClientePagamento = document.getElementById('select-cliente-pagamento');
             
@@ -385,7 +383,6 @@
                 selectClientePagamento.appendChild(optionPagamento);
 
                 let saldoDevedor = 0; 
-                
                 try {
                     const { data: transacoesCliente } = await supabaseClient
                         .from('transacoes')
@@ -425,67 +422,69 @@
                     <span class="client-status ${statusClasse}">${statusTexto}</span>
                     <span class="client-details">Deve: R$ ${saldoDevedor.toFixed(2).replace('.', ',')}</span>
                     <span class="client-details">Limite Restante: R$ ${limiteDisponivel.toFixed(2).replace('.', ',')}</span>
-                    
                     <div class="client-actions">
                         ${saldoDevedor > 0 
                             ? `<a href="https://wa.me/${cliente.telefone}?text=${msgZapCobrar}" target="_blank" class="btn-cobrar">Cobrar no WhatsApp</a>` 
                             : `<button class="btn-cobrar" style="background-color: #ccc; cursor: not-allowed;" disabled>Em dia</button>`
                         }
-                        
                         <button class="btn-vender" onclick="abrirFormularioVendaRapida('${cliente.id}')">Lançar Venda</button>
-                        
                         <a href="https://wa.me/${cliente.telefone}?text=${msgZapLink}" target="_blank" class="btn-compartilhar">🔗 Compartilhar Link</a>
                     </div>
                 `;
                 containerClientes.appendChild(card);
             }
-
             document.getElementById('total-geral-receber').innerText = `R$ ${totalGeralDevedor.toFixed(2).replace('.', ',')}`;
         }
 
+        // FUNÇÕES DE EXIBIÇÃO: VENDA
         function abrirFormularioVenda() {
-            fecharFormularioCliente(); 
-            fecharFormularioPagamento();
+            fecharFormularioCliente(); fecharFormularioPagamento(); fecharFormularioConfig();
             document.getElementById('form-nova-venda').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         function abrirFormularioVendaRapida(clienteId) {
             document.getElementById('select-cliente').value = clienteId;
             abrirFormularioVenda();
         }
-
         function fecharFormularioVenda() {
             document.getElementById('form-nova-venda').style.display = 'none';
             document.getElementById('valor-venda').value = '';
             document.getElementById('desc-venda').value = '';
         }
 
+        // FUNÇÕES DE EXIBIÇÃO: PAGAMENTO
         function abrirFormularioPagamento() {
-            fecharFormularioCliente();
-            fecharFormularioVenda();
+            fecharFormularioCliente(); fecharFormularioVenda(); fecharFormularioConfig();
             document.getElementById('form-novo-pagamento').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         function fecharFormularioPagamento() {
             document.getElementById('form-novo-pagamento').style.display = 'none';
             document.getElementById('valor-pagamento').value = '';
             document.getElementById('desc-pagamento').value = '';
         }
 
+        // FUNÇÕES DE EXIBIÇÃO: CLIENTE
         function abrirFormularioCliente() {
-            fecharFormularioVenda(); 
-            fecharFormularioPagamento();
+            fecharFormularioVenda(); fecharFormularioPagamento(); fecharFormularioConfig();
             document.getElementById('form-novo-cliente').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         function fecharFormularioCliente() {
             document.getElementById('form-novo-cliente').style.display = 'none';
             document.getElementById('nome-cliente').value = '';
             document.getElementById('tel-cliente').value = '';
             document.getElementById('limite-cliente').value = '';
+        }
+
+        // FUNÇÕES DE EXIBIÇÃO: CONFIGURAÇÕES (NOVO)
+        function abrirFormularioConfig() {
+            fecharFormularioVenda(); fecharFormularioPagamento(); fecharFormularioCliente();
+            document.getElementById('form-configuracoes').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function fecharFormularioConfig() {
+            document.getElementById('form-configuracoes').style.display = 'none';
         }
 
         async function salvarVenda() {
@@ -510,12 +509,11 @@
                     }]);
 
                 if (error) throw error;
-                
                 alert('Venda registrada com sucesso! 🚀');
                 fecharFormularioVenda();
                 carregarPainelLojista(); 
             } catch(e) {
-                alert('Erro ao salvar no banco. Salvando localmente para teste!');
+                alert('Erro ao salvar no banco.');
                 fecharFormularioVenda();
             }
         }
@@ -542,12 +540,11 @@
                     }]);
 
                 if (error) throw error;
-                
                 alert('Pagamento registrado com sucesso! 💰');
                 fecharFormularioPagamento();
                 carregarPainelLojista(); 
             } catch(e) {
-                alert('Erro ao salvar no banco. Salvando localmente para teste!');
+                alert('Erro ao salvar no banco.');
                 fecharFormularioPagamento();
             }
         }
@@ -573,13 +570,42 @@
                     }]);
 
                 if (error) throw error;
-
                 alert('Cliente cadastrado com sucesso! 🎉');
                 fecharFormularioCliente();
                 carregarPainelLojista(); 
             } catch(e) {
-                alert('Erro ao salvar cliente no banco. Simulação concluída!');
+                alert('Erro ao salvar cliente no banco.');
                 fecharFormularioCliente();
+            }
+        }
+
+        // FUNÇÃO PARA ATUALIZAR AS CONFIGURAÇÕES (NOVO)
+        async function atualizarConfiguracoes() {
+            const novoNome = document.getElementById('config-nome-loja').value;
+            const novoTel = document.getElementById('config-tel-loja').value;
+            const novaPix = document.getElementById('config-pix-loja').value;
+
+            if (!novoNome || !novoTel || !novaPix) {
+                alert('Por favor, preencha todos os campos das configurações.');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('lojistas')
+                    .update({
+                        nome_comercial: novoNome,
+                        telefone: novoTel,
+                        chave_pix: novaPix
+                    })
+                    .eq('id', lojistaId);
+
+                if (error) throw error;
+                alert('Configurações salvas com sucesso! 🔄');
+                fecharFormularioConfig();
+                carregarPainelLojista(); // Recarrega os dados para atualizar o cabeçalho e mensagens
+            } catch(e) {
+                alert('Erro ao atualizar as configurações no banco.');
             }
         }
 
@@ -597,6 +623,11 @@
             document.getElementById('acao-novo-cliente').onclick = abrirFormularioCliente;
             document.getElementById('btn-cancelar-cliente').onclick = fecharFormularioCliente;
             document.getElementById('btn-salvar-cliente').onclick = salvarCliente;
+
+            // Ativação dos cliques das Configurações (NOVO)
+            document.getElementById('link-config').onclick = abrirFormularioConfig;
+            document.getElementById('btn-cancelar-config').onclick = fecharFormularioConfig;
+            document.getElementById('btn-atualizar-config').onclick = atualizarConfiguracoes;
         });
     </script>
 </body>
