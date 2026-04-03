@@ -264,7 +264,7 @@
 
         <div class="menu-footer">
             <a id="link-config">⚙️ Configurações</a>
-            <a href="#">🗓️ Histórico Completo</a>
+            <a id="link-historico">🗓️ Histórico Completo</a>
         </div>
     </div>
 
@@ -628,6 +628,11 @@
             document.getElementById('link-config').onclick = abrirFormularioConfig;
             document.getElementById('btn-cancelar-config').onclick = fecharFormularioConfig;
             document.getElementById('btn-atualizar-config').onclick = atualizarConfiguracoes;
+
+            // Ativação do botão Histórico Completo (NOVO)
+            document.getElementById('link-historico').onclick = () => {
+                window.location.href = `historico.html?id=${lojistaId}`;
+            };
         });
     </script>
 </body>
