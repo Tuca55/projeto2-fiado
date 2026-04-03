@@ -162,12 +162,28 @@
         .footer-link a:hover {
             text-decoration: underline;
         }
+
+        /* BLOCO DO ANÚNCIO */
+        .espaco-anuncio {
+            background-color: #fff3cd;
+            border: 1px dashed #ffeeba;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #856404;
+            font-size: 0.9em;
+        }
     </style>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
 </head>
 <body>
     <div class="container">
+        <div class="espaco-anuncio">
+            🛍️ <strong>Oferta Especial Shopee:</strong> [Espaço reservado para o seu produto ou link de afiliado]
+        </div>
+
         <h1>MEU FIADO 🛍️</h1>
         <p class="greeting" id="boas-vindas">Carregando...</p>
         <p class="store-name">Esta é a sua conta no: <strong id="nome-loja">...</strong></p>
@@ -200,9 +216,6 @@
         
         let supabaseClient;
 
-        // ==========================================
-        // MUDANÇA AQUI: Agora ele lê o link do navegador!
-        // ==========================================
         const urlParams = new URLSearchParams(window.location.search);
         const clienteId = urlParams.get('id'); 
 
@@ -213,7 +226,6 @@
         }
 
         async function carregarDados() {
-            // Se não tiver nenhum ID no link, ele avisa e para aqui.
             if (!clienteId) {
                 document.getElementById('boas-vindas').innerText = "Link inválido! ❌";
                 document.getElementById('container-historico').innerHTML = '<p style="text-align: center; color: #888;">Por favor, use o link completo enviado pelo lojista.</p>';
@@ -242,7 +254,6 @@
             } catch (error) {
                 console.error('Erro na conexão real:', error);
                 
-                // Dados falsos só para o sistema não quebrar se o banco falhar
                 const clienteSimulado = {
                     nome: "Cliente de Teste",
                     limite_total: 200,
