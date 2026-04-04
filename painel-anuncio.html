@@ -144,16 +144,17 @@
             msg.innerText = "";
 
             const dadosAtualizados = {
+                id: 1, // Força a gravar sempre na linha de ID 1
                 titulo: document.getElementById('titulo').value,
                 descricao: document.getElementById('descricao').value,
                 preco: document.getElementById('preco').value,
                 link: document.getElementById('link').value
             };
 
+            // UPSERT: Se não existir a linha 1, ele cria. Se existir, ele atualiza!
             const { error } = await supabaseClient
                 .from('anuncios')
-                .update(dadosAtualizados)
-                .eq('id', 1);
+                .upsert(dadosAtualizados);
 
             btn.disabled = false;
             btn.innerText = "Salvar Novo Anúncio";
