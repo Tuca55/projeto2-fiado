@@ -116,16 +116,60 @@
 
         // Carregar o anúncio atual quando a página abrir
         async function carregarAnuncioAtual() {
-            const { data, error } = await supabaseClient
-                .from('anuncios')
-                .select('*')
-                .eq('id', 1)
-                .single();
+            try {
+                const { data, error } = await supabaseClient
+                    .from('anuncios')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
 
-            if (data) {
-                document.getElementById('titulo').value = data.titulo || '';
-                document.getElementById('descricao').value = data.descricao || '';
-                document.getElementById('preco').value = data.preco || '';
-                document.getElementById('link').value = data.link || '';
+                if (data) {
+                    document.getElementById('titulo').value = data.titulo || '';
+                    document.getElementById('descricao').value = data.descricao || '';
+                    document.getElementById('preco').value = data.preco || '';
+                    document.getElementById('link').value = data.link || '';
+                }
+            } catch (err) {
+                console.error("Erro ao carregar os dados:", err);
             }
         }
+
+        // Salvar as alterações no banco de dados
+        document.getElementById('btn-salvar').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-salvar');
+            const msg = document.getElementById('mensagem');
+            
+            btn.disabled = true;
+            btn.innerText = "Salvando...";
+            msg.innerText = "";
+
+            const dadosAtualizados = {
+                titulo: document.getElementById('titulo').value,
+                descricao: document.getElementById('descricao').value,
+                preco: document.getElementById('preco').value,
+                link: document.getElementById('link').value
+            };
+
+            const { error } = await supabaseClient
+                .from('anuncios')
+                .update(dadosAtualizados)
+                .eq('id', 1);
+
+            btn.disabled = false;
+            btn.innerText = "Salvar Novo Anúncio";
+
+            if (error) {
+                msg.style.color = "#dc3545";
+                msg.innerText = "Erro ao salvar! Tente novamente.";
+                console.error(error);
+            } else {
+                msg.style.color = "#28a745";
+                msg.innerText = "Anúncio atualizado com sucesso! 🎉";
+            }
+        });
+
+        // Executa ao carregar a página
+        document.addEventListener('DOMContentLoaded', carregarAnuncioAtual);
+    </script>
+</body>
+</html>
