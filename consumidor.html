@@ -173,6 +173,7 @@
             text-align: center;
             color: #856404;
             font-size: 0.9em;
+            display: none; /* Começa escondido até o banco carregar */
         }
     </style>
     
@@ -180,11 +181,11 @@
 </head>
 <body>
     <div class="container">
-        <div class="espaco-anuncio">
-            💜 <strong>Desejo do dia: Açaí Original!</strong> 🍧<br>
-            Cremoso, refrescante e com o sabor de verdade que você adora.<br>
-            Apenas <strong>R$ 16,00 o litro</strong>! Aproveite para garantir o seu.<br>
-            <a href="#" style="color: #007bff; text-decoration: none; font-weight: bold;">👉 Clique aqui e peça agora</a>
+        <div class="espaco-anuncio" id="bloco-anuncio">
+            <span id="anuncio-titulo"></span><br>
+            <span id="anuncio-descricao"></span><br>
+            <strong><span id="anuncio-preco"></span></strong><br>
+            <a href="#" id="anuncio-link" style="color: #007bff; text-decoration: none; font-weight: bold;">👉 Clique aqui e aproveite</a>
         </div>
 
         <h1>MEU FIADO 🛍️</h1>
@@ -229,6 +230,25 @@
         }
 
         async function carregarDados() {
+            // BUSCAR ANÚNCIO DO SUPABASE
+            try {
+                const { data: anuncio } = await supabaseClient
+                    .from('anuncios')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+
+                if (anuncio) {
+                    document.getElementById('anuncio-titulo').innerHTML = `💜 <strong>${anuncio.titulo}</strong> 🍧`;
+                    document.getElementById('anuncio-descricao').innerText = anuncio.descricao;
+                    document.getElementById('anuncio-preco').innerText = anuncio.preco;
+                    document.getElementById('anuncio-link').href = anuncio.link || '#';
+                    document.getElementById('bloco-anuncio').style.display = 'block'; // Mostra o anúncio
+                }
+            } catch (err) {
+                console.error("Erro ao carregar anúncio:", err);
+            }
+
             if (!clienteId) {
                 document.getElementById('boas-vindas').innerText = "Link inválido! ❌";
                 document.getElementById('container-historico').innerHTML = '<p style="text-align: center; color: #888;">Por favor, use o link completo enviado pelo lojista.</p>';
