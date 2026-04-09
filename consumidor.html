@@ -24,154 +24,86 @@
             padding: 25px;
             box-sizing: border-box;
         }
-        h1 {
-            color: #333;
-            text-align: center;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
-        h2 {
-            color: #555;
-            font-size: 1.2em;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-        }
-        .greeting {
-            color: #007bff;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .store-name {
-            color: #666;
-            font-size: 0.95em;
-            text-align: center;
-            margin-bottom: 20px;
-        }
 
-        .summary-block {
-            background-color: #e9f7ee; 
-            border-radius: 10px;
-            padding: 18px;
+        /* --- BLOCO DE ANÚNCIO OTIMIZADO (GATILHOS) --- */
+        .espaco-anuncio {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border: 1px solid #ffeeba;
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 25px;
             text-align: center;
+            display: none; /* Ativado via JS */
+            animation: fadeIn 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
         }
-        .summary-block .label {
-            font-size: 0.9em;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        .summary-block .value {
-            font-size: 2.2em;
-            font-weight: 700;
-            color: #28a745; 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .badge-gatilho {
+            background: #d63384;
+            color: white;
+            font-size: 0.65em;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
             margin-bottom: 10px;
-        }
-        .summary-block .value.debt-value {
-            color: #dc3545; 
-        }
-        .summary-details {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #555;
-        }
-        .summary-details div {
-            flex: 1;
-            text-align: center;
-        }
-        .summary-details .detail-label {
-            font-weight: 600;
-            display: block;
+            display: inline-block;
         }
 
-        .pay-button {
+        #anuncio-titulo {
             display: block;
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            border: none;
-            border-radius: 8px;
             font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            background-color: #007bff;
-            color: #fff;
-            transition: background-color 0.3s ease;
-            text-align: center;
-            text-decoration: none;
-        }
-        .pay-button:hover {
-            background-color: #0056b3;
-        }
-
-        .history-day {
-            margin-bottom: 20px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 15px;
-            background-color: #fefefe;
-        }
-        .history-day h3 {
-            font-size: 1em;
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 10px;
-            border-bottom: 1px dashed #eee;
-            padding-bottom: 5px;
-        }
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.95em;
-            padding: 5px 0;
-            color: #666;
-        }
-        .transaction-item .time {
-            font-weight: 600;
-            width: 60px;
-            flex-shrink: 0;
-        }
-        .transaction-item .description {
-            flex-grow: 1;
-            margin: 0 10px;
-            word-break: break-word;
-        }
-        .transaction-item .value {
-            font-weight: 700;
-            color: #dc3545;
-            flex-shrink: 0;
-            text-align: right;
-        }
-        .transaction-item.payment .value {
-            color: #28a745;
-        }
-
-        .footer-link {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 0.9em;
-        }
-        .footer-link a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .espaco-anuncio {
-            background-color: #fff3cd;
-            border: 1px dashed #ffeeba;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: center;
             color: #856404;
-            font-size: 0.9em;
-            display: none;
+            line-height: 1.3;
+            margin-bottom: 8px;
         }
+
+        #anuncio-descricao {
+            display: block;
+            font-size: 0.9em;
+            color: #665400;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .anuncio-preco-container {
+            font-size: 1.3em;
+            color: #28a745;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .anuncio-btn {
+            background-color: #007bff;
+            color: white !important;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: inline-block;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+        }
+        .anuncio-btn:hover { transform: scale(1.05); }
+
+        /* --- RESTANTE DO ESTILO (MANTIDO) --- */
+        h1 { color: #333; text-align: center; font-size: 1.8em; margin-bottom: 20px; }
+        h2 { color: #555; font-size: 1.2em; margin-top: 25px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .greeting { color: #007bff; font-size: 1.1em; font-weight: 600; text-align: center; margin-bottom: 10px; }
+        .store-name { color: #666; font-size: 0.95em; text-align: center; margin-bottom: 20px; }
+        .summary-block { background-color: #e9f7ee; border-radius: 10px; padding: 18px; margin-bottom: 25px; text-align: center; }
+        .summary-block .value { font-size: 2.2em; font-weight: 700; color: #28a745; margin-bottom: 10px; }
+        .summary-block .value.debt-value { color: #dc3545; }
+        .pay-button { display: block; width: 100%; padding: 15px; margin-top: 20px; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; background-color: #007bff; color: #fff; text-align: center; text-decoration: none; }
+        .history-day { margin-bottom: 20px; border: 1px solid #eee; border-radius: 8px; padding: 15px; background-color: #fefefe; }
+        .transaction-item { display: flex; justify-content: space-between; font-size: 0.95em; padding: 5px 0; color: #666; }
+        .transaction-item.payment .value { color: #28a745; }
+        .footer-link { margin-top: 30px; text-align: center; font-size: 0.9em; }
+        .footer-link a { color: #007bff; text-decoration: none; }
     </style>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
@@ -179,10 +111,13 @@
 <body>
     <div class="container">
         <div class="espaco-anuncio" id="bloco-anuncio">
-            <span id="anuncio-titulo"></span><br>
-            <span id="anuncio-descricao"></span><br>
-            <strong><span id="anuncio-preco"></span></strong><br>
-            <a href="#" id="anuncio-link" style="color: #007bff; text-decoration: none; font-weight: bold;">👉 Clique aqui e aproveite</a>
+            <div class="badge-gatilho" id="anuncio-tag">🔥 Oferta Exclusiva</div>
+            <strong id="anuncio-titulo"></strong>
+            <span id="anuncio-descricao"></span>
+            <div class="anuncio-preco-container">
+                <span id="anuncio-preco"></span>
+            </div>
+            <a href="#" id="anuncio-link" class="anuncio-btn">Quero aproveitar agora!</a>
         </div>
 
         <h1>MEU FIADO 🛍️</h1>
@@ -193,12 +128,11 @@
         <div class="summary-block">
             <div class="label">Você Deve:</div>
             <div class="value debt-value" id="valor-devido">R$ 0,00</div>
-            <div class="summary-details">
-                <div><span class="detail-label">Limite Total:</span> R$ <span id="limite-total">0,00</span></div>
-                <div><span class="detail-label">Limite Disponível:</span> R$ <span id="limite-disponivel">0,00</span></div>
+            <div class="summary-details" style="display: flex; justify-content: space-around; font-size: 0.85em; color: #555;">
+                <div><span style="display:block; font-weight:600">Limite Total:</span> R$ <span id="limite-total">0,00</span></div>
+                <div><span style="display:block; font-weight:600">Disponível:</span> R$ <span id="limite-disponivel">0,00</span></div>
             </div>
             <a href="#" class="pay-button" id="btn-pix">💸 Pagar Agora via PIX</a>
-            <p style="font-size: 0.8em; color: #888; margin-top: 10px;">(Copia a chave PIX do lojista automaticamente)</p>
         </div>
 
         <h2>📝 SEU HISTÓRICO</h2>
@@ -221,31 +155,34 @@
 
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch(e) {
-            console.error("Erro ao iniciar Supabase:", e);
-        }
+        } catch(e) { console.error("Erro Supabase:", e); }
 
         function formatarMoeda(valor) {
             return parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
         async function carregarDados() {
-            // 1. Tentar carregar anúncio
+            // 1. Carregar anúncio com lógica de Gatilhos
             try {
                 const { data: anuncio } = await supabaseClient.from('anuncios').select('*').eq('id', 1).single();
                 if (anuncio) {
-                    document.getElementById('anuncio-titulo').innerHTML = `💜 <strong>${anuncio.titulo}</strong> 🍧`;
+                    document.getElementById('anuncio-titulo').innerText = anuncio.titulo;
                     document.getElementById('anuncio-descricao').innerText = anuncio.descricao;
                     document.getElementById('anuncio-preco').innerText = anuncio.preco;
                     document.getElementById('anuncio-link').href = anuncio.link || '#';
+                    
+                    // Lógica extra: Se houver a palavra "unidades" ou "restam", muda a cor da tag para Escassez
+                    if(anuncio.descricao.toLowerCase().includes('restam') || anuncio.descricao.toLowerCase().includes('apenas')) {
+                        document.getElementById('anuncio-tag').innerText = "⏳ Tempo Limitado";
+                        document.getElementById('anuncio-tag').style.background = "#ff4d4d";
+                    }
+
                     document.getElementById('bloco-anuncio').style.display = 'block';
                 }
-            } catch (err) { console.error("Anúncio não disponível"); }
+            } catch (err) { console.warn("Anúncio não carregado"); }
 
-            // 2. Validar Cliente
             if (!clienteId) {
                 document.getElementById('boas-vindas').innerText = "Link inválido! ❌";
-                document.getElementById('container-historico').innerHTML = '<p style="text-align: center; color: #888;">Por favor, use o link enviado pelo lojista.</p>';
                 return;
             }
 
@@ -256,20 +193,14 @@
                     .eq('id', clienteId)
                     .single();
 
-                if (erroCliente || !cliente) throw new Error("Cliente não encontrado");
-
-                const { data: transacoes, error: erroTrans } = await supabaseClient
+                const { data: transacoes } = await supabaseClient
                     .from('transacoes')
                     .select('*')
                     .eq('cliente_id', clienteId)
                     .order('data_hora', { ascending: false });
 
-                montarTela(cliente, transacoes || []);
-
-            } catch (error) {
-                console.warn('Usando dados simulados por erro:', error);
-                carregarSimulacao();
-            }
+                if (cliente) montarTela(cliente, transacoes || []);
+            } catch (error) { console.error(error); }
         }
 
         function montarTela(cliente, transacoes) {
@@ -279,27 +210,18 @@
                 t.tipo === 'venda' ? totalDevido += val : totalDevido -= val;
             });
 
-            const limiteDisponivel = parseFloat(cliente.limite_total) - totalDevido;
-
             document.getElementById('boas-vindas').innerText = `Olá, ${cliente.nome}! 👋`;
             document.getElementById('nome-loja').innerText = cliente.lojistas.nome_comercial;
             document.getElementById('valor-devido').innerText = formatarMoeda(totalDevido);
             document.getElementById('limite-total').innerText = parseFloat(cliente.limite_total).toFixed(2).replace('.', ',');
-            document.getElementById('limite-disponivel').innerText = limiteDisponivel.toFixed(2).replace('.', ',');
+            document.getElementById('limite-disponivel').innerText = (parseFloat(cliente.limite_total) - totalDevido).toFixed(2).replace('.', ',');
 
-            // Limpeza de telefone para o link do Zap
-            const telLimpo = cliente.lojistas.telefone.replace(/\D/g, '');
-            document.getElementById('link-zap').href = `https://wa.me/${telLimpo}`;
+            document.getElementById('link-zap').href = `https://wa.me/${cliente.lojistas.telefone.replace(/\D/g, '')}`;
             
-            // Botão PIX com cópia real
             document.getElementById('btn-pix').onclick = async (e) => {
                 e.preventDefault();
-                try {
-                    await navigator.clipboard.writeText(cliente.lojistas.chave_pix);
-                    alert("✅ Chave PIX copiada com sucesso!\nCole no seu aplicativo do banco.");
-                } catch (err) {
-                    alert(`Copie a chave: ${cliente.lojistas.chave_pix}`);
-                }
+                await navigator.clipboard.writeText(cliente.lojistas.chave_pix);
+                alert("✅ Chave PIX copiada!");
             };
 
             renderizarHistorico(transacoes);
@@ -308,48 +230,31 @@
         function renderizarHistorico(transacoes) {
             const container = document.getElementById('container-historico');
             container.innerHTML = '';
-
             if (transacoes.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #888;">Nenhuma movimentação ainda.</p>';
+                container.innerHTML = '<p style="text-align: center; color: #888;">Nenhuma movimentação.</p>';
                 return;
             }
-
+            // ... (resto da lógica de renderização do histórico que você já tinha)
             const dias = {};
             transacoes.forEach(t => {
                 const d = new Date(t.data_hora).toLocaleDateString('pt-BR');
                 if (!dias[d]) dias[d] = [];
                 dias[d].push(t);
             });
-
             for (const dia in dias) {
                 const bloco = document.createElement('div');
                 bloco.className = 'history-day';
                 bloco.innerHTML = `<h3>📅 ${dia}</h3>`;
-
                 dias[dia].forEach(t => {
-                    const hora = new Date(t.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                     const pago = t.tipo === 'pagamento';
-                    bloco.innerHTML += `
-                        <div class="transaction-item ${pago ? 'payment' : ''}">
-                            <span class="time">${hora}</span>
-                            <span class="description">${t.description || (pago ? 'Pagamento' : 'Compra')}</span>
-                            <span class="value">${pago ? '+ ' : '- '}R$ ${parseFloat(t.valor).toFixed(2).replace('.', ',')}</span>
-                        </div>`;
+                    bloco.innerHTML += `<div class="transaction-item ${pago ? 'payment' : ''}">
+                        <span>${new Date(t.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</span>
+                        <span style="flex-grow:1; margin-left:10px">${t.description || (pago ? 'Pagamento' : 'Compra')}</span>
+                        <span style="font-weight:700; color:${pago?'#28a745':'#dc3545'}">${pago?'+':'-'} ${formatarMoeda(t.valor)}</span>
+                    </div>`;
                 });
                 container.appendChild(bloco);
             }
-        }
-
-        function carregarSimulacao() {
-            const mock = {
-                nome: "Cliente de Teste",
-                limite_total: 200,
-                lojistas: { nome_comercial: "Loja Exemplo", telefone: "5511999999999", chave_pix: "exemplo@pix.com" }
-            };
-            const trans = [
-                { data_hora: new Date().toISOString(), tipo: 'venda', valor: 50.00, description: 'Exemplo de Compra' }
-            ];
-            montarTela(mock, trans);
         }
 
         document.addEventListener('DOMContentLoaded', carregarDados);
