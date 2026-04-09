@@ -3,149 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oportunidade Home Office - CM ATIVA</title>
+    <title>RENDA EXTRA HOME OFFICE - VAGAS LIMITADAS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #ffc107;
+            --secondary: #28a745;
+            --dark: #1a1a1a;
+            --danger: #dc3545;
+            --text-light: #f8f9fa;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif, Arial;
+            margin: 0;
+            background-color: #0b0b0b;
+            color: #e0e0e0;
             line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f9;
         }
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        h1, h2 {
-            color: #2c3e50;
+
+        /* Gatilho: Urgência/Escassez no Topo */
+        .top-bar {
+            background: var(--danger);
+            color: white;
             text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
             text-transform: uppercase;
         }
-        .highlight-box {
-            background-color: #e7f3fe;
-            border-left: 5px solid #2196F3;
-            padding: 15px;
-            margin: 20px 0;
-        }
-        .cta-section {
+
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            padding: 80px 20px;
             text-align: center;
-            background-color: #27ae60;
-            color: white;
-            padding: 25px;
-            border-radius: 5px;
-            margin-top: 30px;
+            border-bottom: 4px solid var(--primary);
         }
-        .cta-section a {
-            color: #fff;
-            font-weight: bold;
-            text-decoration: underline;
+
+        .hero h1 {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
-        .faq-section {
-            margin-top: 40px;
-            border-top: 2px solid #eee;
-            padding-top: 20px;
+
+        .hero p { font-size: 1.4rem; color: #fff; max-width: 800px; margin: 0 auto; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+
+        /* Gatilho: Curiosidade */
+        .curiosidade-box {
+            background: #222;
+            border: 2px solid var(--primary);
+            padding: 30px;
+            border-radius: 15px;
+            margin: -60px auto 40px;
+            position: relative;
+            z-index: 10;
         }
-        .question {
-            font-weight: bold;
-            color: #2980b9;
-            margin-top: 15px;
+
+        .curiosidade-box h2 { color: var(--primary); margin-top: 0; }
+
+        /* Gatilho: Prova Social */
+        .testimonials {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
         }
-        .answer {
-            margin-bottom: 15px;
-            padding-left: 10px;
+
+        .test-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            border-bottom: 3px solid var(--secondary);
         }
+
+        .test-card p { font-style: italic; font-size: 0.95rem; }
+        .test-card span { font-weight: bold; color: var(--secondary); display: block; margin-top: 10px; }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .step {
+            text-align: center;
+            padding: 20px;
+            background: #252525;
+            border-radius: 10px;
+        }
+
+        .step i { font-size: 2.5rem; color: var(--primary); margin-bottom: 15px; }
+
+        /* Gatilho: Desejo / Oferta Irresistível */
+        .offer-card {
+            background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid var(--secondary);
+            margin: 50px 0;
+        }
+
         .price-tag {
-            font-size: 1.2em;
-            color: #c0392b;
+            font-size: 4rem;
+            color: var(--secondary);
+            font-weight: 900;
+            margin: 10px 0;
+        }
+
+        .btn-cta {
+            background: var(--secondary);
+            color: white;
+            padding: 25px 50px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            text-decoration: none;
             font-weight: bold;
+            display: inline-block;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+            text-transform: uppercase;
         }
-        .footer {
-            margin-top: 40px;
-            text-align: center;
-            font-size: 0.9em;
-            color: #7f8c8d;
+
+        .btn-cta:hover {
+            transform: scale(1.05);
+            background: #218838;
+            box-shadow: 0 15px 30px rgba(40, 167, 69, 0.5);
         }
-        ul {
-            list-style-type: square;
+
+        .escassez-texto {
+            color: var(--danger);
+            font-weight: bold;
+            margin-top: 15px;
+            display: block;
         }
-        .promo {
-            text-decoration: line-through;
-            color: #7f8c8d;
+
+        .faq { background: #111; padding: 40px; border-radius: 10px; margin-top: 50px; }
+        .faq h3 { color: var(--primary); }
+
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #25d366;
+            color: white;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-decoration: none;
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .price-tag { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>SEJA BEM-VINDO</h1>
-    <h2>OPORTUNIDADE DE TRABALHO EXTRA EM CASA</h2>
-    
-    <p>Segue abaixo um informativo explicando como funciona o trabalho (Renda Extra) e qual o procedimento e instruções para participar da nossa equipe.</p>
-
-    <div class="highlight-box">
-        <strong>Leia com ATENÇÃO:</strong><br>
-        Somos uma companhia para autônomos no segmento de Home-Office/E-commerce (Trabalho em Casa). Estamos em fase de crescimento e com planos de novos projetos.
+    <div class="top-bar">
+        ⚠️ ATENÇÃO: ÚLTIMAS 12 VAGAS DISPONÍVEIS PARA MANAUS E REGIÃO
     </div>
 
-    <h3>Requisitos Necessários:</h3>
-    <ul>
-        <li>Computador, Notebook, Tablet ou Smartphone confiável.</li>
-        <li>Acesso à Internet estável.</li>
-        <li>Conta de e-mail válida.</li>
-        <li>Habilidades mínimas de digitação e postura profissional.</li>
-    </ul>
+    <section class="hero">
+        <h1>DESCUBRA O SEGREDO PARA FATURAR R$ 400 A R$ 1.000 POR SEMANA SEM SAIR DE CASA!</h1>
+        <p>Você só precisa de um celular, internet e 2 horas do seu dia. O método testado e aprovado por mais de 15.000 pessoas.</p>
+    </section>
 
-    <h3>O que você irá fazer:</h3>
-    <ul>
-        <li>Digitar formulários</li>
-        <li>Avaliar mídias e sites</li>
-        <li>Responder e enviar e-mails (opcional)</li>
-    </ul>
+    <div class="container">
+        <div class="curiosidade-box">
+            <h2><i class="fas fa-lock-open"></i> O que as grandes empresas não te contam?</h2>
+            <p>Google, Amazon e Netflix pagam milhares de reais todos os meses para pessoas comuns realizarem tarefas simples como avaliação de sites e preenchimento de formulários. Nós liberamos o caminho das pedras para você começar <strong>hoje mesmo</strong>.</p>
+        </div>
 
-    <p>Você receberá de <strong>R$ 15,00 a R$ 50,00</strong> para cada tarefa completada. A média de ganhos varia entre <strong>R$ 400,00 a R$ 1.000,00 semanais</strong>, dependendo da sua dedicação.</p>
+        <h2 style="text-align: center; color: var(--primary);">VEJA QUEM JÁ ESTÁ FATURANDO (PROVA SOCIAL)</h2>
+        <div class="testimonials">
+            <div class="test-card">
+                <p>"Estava desempregada e com contas atrasadas. No meu primeiro mês fiz R$ 1.200 trabalhando só à noite. Salvou minha vida!"</p>
+                <span>— Mariana S., Manaus-AM</span>
+            </div>
+            <div class="test-card">
+                <p>"O material é direto ao ponto. Em 48h eu já tinha recuperado meus 15 reais e já estava no lucro. Recomendo muito!"</p>
+                <span>— Ricardo F., São Paulo-SP</span>
+            </div>
+            <div class="test-card">
+                <p>"Trabalho como Uber e faço isso nos intervalos. Consigo tirar uma grana extra sensacional pra ajudar nas despesas de casa."</p>
+                <span>— João P., Curitiba-PR</span>
+            </div>
+        </div>
 
-    <div class="highlight-box">
-        <strong>Investimento:</strong> Taxa única de <strong>R$ 15,00</strong> para o Material de Trabalho (Material Home Office 7.0 + Bônus). Sem custos adicionais ocultos.
+        <h2 style="text-align: center;">COMO FUNCIONA? É SIMPLES:</h2>
+        <div class="steps-grid">
+            <div class="step">
+                <i class="fas fa-file-alt"></i>
+                <h3>1. Receba o Material</h3>
+                <p>Acesso imediato ao kit Home Office 7.0.</p>
+            </div>
+            <div class="step">
+                <i class="fas fa-check-double"></i>
+                <h3>2. Escolha as Tarefas</h3>
+                <p>Avalie sites, mídias ou digite formulários.</p>
+            </div>
+            <div class="step">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h3>3. Receba o PIX</h3>
+                <p>Pagamento direto na sua conta todo santo dia.</p>
+            </div>
+        </div>
+
+        <div class="offer-card">
+            <h3>VOCÊ ESTÁ A UM PASSO DA SUA LIBERDADE FINANCEIRA</h3>
+            <p>Garanta seu Kit de Treinamento Completo + Bônus Exclusivos</p>
+            <div style="text-decoration: line-through; color: #888;">De: R$ 97,00</div>
+            <div class="price-tag">R$ 15,00</div>
+            <p><strong>Aproveite o preço promocional por tempo limitado!</strong></p>
+            
+            <a href="https://mpago.la/2EcmLRC" class="btn-cta">
+                <i class="fas fa-rocket"></i> QUERO COMEÇAR AGORA!
+            </a>
+
+            <span class="escassez-texto">
+                <i class="fas fa-clock"></i> Oferta expira em: <span id="timer">09:57</span>
+            </span>
+            
+            <div style="margin-top: 20px;">
+                <p>PIX: <strong>clarasantosfonsec@gmail.com</strong></p>
+                <img src="https://logospng.org/download/pix/logo-pix-1024.png" width="80" alt="Pix">
+            </div>
+        </div>
+
+        <div class="faq">
+            <h2 style="text-align: center;">DÚVIDAS FREQUENTES</h2>
+            <h3>P: Preciso de experiência?</h3>
+            <p>R: Não! O treinamento ensina o passo a passo do zero, mesmo para quem não entende nada de internet.</p>
+            
+            <h3>P: É golpe?</h3>
+            <p>R: De forma alguma. Trabalhamos sob a Lei N°6.667/13. Você está comprando um material didático (infoproduto) que te ensina a prestar serviços como freelancer.</p>
+            
+            <h3>P: Quanto tempo demora para receber o material?</h3>
+            <p>R: Via PIX ou Cartão o envio é imediato para o seu e-mail!</p>
+        </div>
+
+        <p style="text-align: center; margin-top: 50px; font-size: 0.8rem; opacity: 0.6;">
+            Equipe CM ATIVA Seu Negócio na Internet | Todos os direitos reservados.
+        </p>
     </div>
 
-    <div class="faq-section">
-        <h3>Perguntas Frequentes (FAQ)</h3>
-        
-        <p class="question">P: Como sou pago?</p>
-        <p class="answer">R: Por cada aplicação completada, diretamente em sua conta corrente ou poupança via Mercado Pago.</p>
+    <a href="https://wa.me/message/U5IGNMY5ES5QD1" class="whatsapp-float">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
-        <p class="question">P: Quanto é o pagamento?</p>
-        <p class="answer">R: Média de R$ 20 a R$ 50 por aplicação. Pagamos R$ 30 por hora avaliando sites, R$ 2,50 por formulário e R$ 3,50 por pesquisa.</p>
-
-        <p class="question">P: Por que pagar pelo treinamento?</p>
-        <p class="answer">R: O manual contém conteúdos sigilosos e oferece o respaldo necessário para o início imediato das atividades como freelancer.</p>
-
-        <p class="question">P: É uma empresa?</p>
-        <p class="answer">R: Não. Somos uma equipe de Home-Office/E-Commerce que fornece material para profissionais autônomos/freelancers, conforme a lei Nº 6.667/13.</p>
-    </div>
-
-    <div class="cta-section">
-        <h3>PROMOÇÃO EXCLUSIVA</h3>
-        <p>De: <span class="promo">R$ 97,00</span> por apenas <strong>R$ 15,00</strong></p>
-        <p><strong>FORMAS DE PAGAMENTO:</strong></p>
-        <p><a href="https://mpago.la/2EcmLRC" target="_blank">Clique aqui para pagar via MERCADO PAGO</a></p>
-        <p>CHAVE PIX: <strong>clarasantosfonsec@gmail.com</strong></p>
-    </div>
-
-    <p style="margin-top: 20px; font-size: 0.9em; text-align: center;">
-        Dúvidas ou suporte após pagamento? <br>
-        <a href="https://wa.me/message/U5IGNMY5ES5QD1" target="_blank">Fale conosco pelo WhatsApp</a>
-    </p>
-
-    <div class="footer">
-        <p>Atenciosamente,<br>
-        <strong>Equipe CM ATIVA Seu Negócio na Internet</strong></p>
-    </div>
-</div>
+    <script>
+        // Simples script para o cronômetro de escassez
+        function startTimer(duration, display) {
+            var timer = duration, minutes, seconds;
+            setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                display.textContent = minutes + ":" + seconds;
+                if (--timer < 0) { timer = duration; }
+            }, 1000);
+        }
+        window.onload = function () {
+            var tenMinutes = 60 * 10,
+            display = document.querySelector('#timer');
+            startTimer(tenMinutes, display);
+        };
+    </script>
 
 </body>
 </html>
