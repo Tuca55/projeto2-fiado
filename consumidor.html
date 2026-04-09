@@ -139,6 +139,7 @@
         .transaction-item .description {
             flex-grow: 1;
             margin: 0 10px;
+            word-break: break-word;
         }
         .transaction-item .value {
             font-weight: 700;
@@ -159,11 +160,7 @@
             color: #007bff;
             text-decoration: none;
         }
-        .footer-link a:hover {
-            text-decoration: underline;
-        }
 
-        /* BLOCO DO ANÚNCIO */
         .espaco-anuncio {
             background-color: #fff3cd;
             border: 1px dashed #ffeeba;
@@ -173,7 +170,7 @@
             text-align: center;
             color: #856404;
             font-size: 0.9em;
-            display: none; /* Começa escondido até o banco carregar */
+            display: none;
         }
     </style>
     
@@ -210,7 +207,7 @@
         </div>
         
         <div class="footer-link">
-            <a href="#" id="link-zap">Dúvidas sobre a conta? Chamar no Zap</a>
+            <a href="#" id="link-zap" target="_blank">Dúvidas sobre a conta? Chamar no Zap</a>
         </div>
     </div>
 
@@ -219,7 +216,6 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
         
         let supabaseClient;
-
         const urlParams = new URLSearchParams(window.location.search);
         const clienteId = urlParams.get('id'); 
 
@@ -229,29 +225,27 @@
             console.error("Erro ao iniciar Supabase:", e);
         }
 
-        async function carregarDados() {
-            // BUSCAR ANÚNCIO DO SUPABASE
-            try {
-                const { data: anuncio } = await supabaseClient
-                    .from('anuncios')
-                    .select('*')
-                    .eq('id', 1)
-                    .single();
+        function formatarMoeda(valor) {
+            return parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
 
+        async function carregarDados() {
+            // 1. Tentar carregar anúncio
+            try {
+                const { data: anuncio } = await supabaseClient.from('anuncios').select('*').eq('id', 1).single();
                 if (anuncio) {
                     document.getElementById('anuncio-titulo').innerHTML = `💜 <strong>${anuncio.titulo}</strong> 🍧`;
                     document.getElementById('anuncio-descricao').innerText = anuncio.descricao;
                     document.getElementById('anuncio-preco').innerText = anuncio.preco;
                     document.getElementById('anuncio-link').href = anuncio.link || '#';
-                    document.getElementById('bloco-anuncio').style.display = 'block'; // Mostra o anúncio
+                    document.getElementById('bloco-anuncio').style.display = 'block';
                 }
-            } catch (err) {
-                console.error("Erro ao carregar anúncio:", err);
-            }
+            } catch (err) { console.error("Anúncio não disponível"); }
 
+            // 2. Validar Cliente
             if (!clienteId) {
                 document.getElementById('boas-vindas').innerText = "Link inválido! ❌";
-                document.getElementById('container-historico').innerHTML = '<p style="text-align: center; color: #888;">Por favor, use o link completo enviado pelo lojista.</p>';
+                document.getElementById('container-historico').innerHTML = '<p style="text-align: center; color: #888;">Por favor, use o link enviado pelo lojista.</p>';
                 return;
             }
 
@@ -262,7 +256,7 @@
                     .eq('id', clienteId)
                     .single();
 
-                if (erroCliente) throw erroCliente;
+                if (erroCliente || !cliente) throw new Error("Cliente não encontrado");
 
                 const { data: transacoes, error: erroTrans } = await supabaseClient
                     .from('transacoes')
@@ -270,84 +264,92 @@
                     .eq('cliente_id', clienteId)
                     .order('data_hora', { ascending: false });
 
-                if (erroTrans) throw erroTrans;
-
-                montarTela(cliente, transacoes);
+                montarTela(cliente, transacoes || []);
 
             } catch (error) {
-                console.error('Erro na conexão real:', error);
-                
-                const clienteSimulado = {
-                    nome: "Cliente de Teste",
-                    limite_total: 200,
-                    lojistas: { nome_comercial: "Loja Simulação", telefone: "5511999999999", chave_pix: "pix@loja.com" }
-                };
-                
-                const transacoesSimuladas = [
-                    {data_hora: new Date().toISOString(), tipo: 'venda', valor: 25.50, descricao: 'Pão e Leite'},
-                    {data_hora: new Date().toISOString(), tipo: 'venda', valor: 10.00, descricao: 'Refrigerante'}
-                ];
-                
-                montarTela(clienteSimulado, transacoesSimuladas);
+                console.warn('Usando dados simulados por erro:', error);
+                carregarSimulacao();
             }
         }
 
         function montarTela(cliente, transacoes) {
             let totalDevido = 0;
             transacoes.forEach(t => {
-                if (t.tipo === 'venda') totalDevido += parseFloat(t.valor);
-                if (t.tipo === 'pagamento') totalDevido -= parseFloat(t.valor);
+                const val = parseFloat(t.valor);
+                t.tipo === 'venda' ? totalDevido += val : totalDevido -= val;
             });
+
             const limiteDisponivel = parseFloat(cliente.limite_total) - totalDevido;
 
             document.getElementById('boas-vindas').innerText = `Olá, ${cliente.nome}! 👋`;
             document.getElementById('nome-loja').innerText = cliente.lojistas.nome_comercial;
-            document.getElementById('valor-devido').innerText = `R$ ${totalDevido.toFixed(2).replace('.', ',')}`;
+            document.getElementById('valor-devido').innerText = formatarMoeda(totalDevido);
             document.getElementById('limite-total').innerText = parseFloat(cliente.limite_total).toFixed(2).replace('.', ',');
             document.getElementById('limite-disponivel').innerText = limiteDisponivel.toFixed(2).replace('.', ',');
 
-            document.getElementById('link-zap').href = `https://wa.me/${cliente.lojistas.telefone}`;
+            // Limpeza de telefone para o link do Zap
+            const telLimpo = cliente.lojistas.telefone.replace(/\D/g, '');
+            document.getElementById('link-zap').href = `https://wa.me/${telLimpo}`;
             
-            document.getElementById('btn-pix').onclick = (e) => {
+            // Botão PIX com cópia real
+            document.getElementById('btn-pix').onclick = async (e) => {
                 e.preventDefault();
-                alert(`Chave PIX copiada: ${cliente.lojistas.chave_pix}`);
+                try {
+                    await navigator.clipboard.writeText(cliente.lojistas.chave_pix);
+                    alert("✅ Chave PIX copiada com sucesso!\nCole no seu aplicativo do banco.");
+                } catch (err) {
+                    alert(`Copie a chave: ${cliente.lojistas.chave_pix}`);
+                }
             };
 
-            const historicoDiv = document.getElementById('container-historico');
-            historicoDiv.innerHTML = ''; 
+            renderizarHistorico(transacoes);
+        }
+
+        function renderizarHistorico(transacoes) {
+            const container = document.getElementById('container-historico');
+            container.innerHTML = '';
 
             if (transacoes.length === 0) {
-                historicoDiv.innerHTML = '<p style="text-align: center; color: #888;">Nenhuma movimentação ainda.</p>';
+                container.innerHTML = '<p style="text-align: center; color: #888;">Nenhuma movimentação ainda.</p>';
                 return;
             }
 
-            const diasAgrupados = {};
+            const dias = {};
             transacoes.forEach(t => {
-                const dataSimples = new Date(t.data_hora).toLocaleDateString('pt-BR');
-                if (!diasAgrupados[dataSimples]) diasAgrupados[dataSimples] = [];
-                diasAgrupados[dataSimples].push(t);
+                const d = new Date(t.data_hora).toLocaleDateString('pt-BR');
+                if (!dias[d]) dias[d] = [];
+                dias[d].push(t);
             });
 
-            for (const dia in diasAgrupados) {
-                const diaBloco = document.createElement('div');
-                diaBloco.className = 'history-day';
-                diaBloco.innerHTML = `<h3>📅 ${dia}</h3>`;
+            for (const dia in dias) {
+                const bloco = document.createElement('div');
+                bloco.className = 'history-day';
+                bloco.innerHTML = `<h3>📅 ${dia}</h3>`;
 
-                diasAgrupados[dia].forEach(t => {
+                dias[dia].forEach(t => {
                     const hora = new Date(t.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                    const ehPagamento = t.tipo === 'pagamento';
-                    
-                    diaBloco.innerHTML += `
-                        <div class="transaction-item ${ehPagamento ? 'payment' : ''}">
+                    const pago = t.tipo === 'pagamento';
+                    bloco.innerHTML += `
+                        <div class="transaction-item ${pago ? 'payment' : ''}">
                             <span class="time">${hora}</span>
-                            <span class="description">${t.descricao || (ehPagamento ? 'Pagamento' : 'Compra')}</span>
-                            <span class="value">${ehPagamento ? '' : '- '}R$ ${parseFloat(t.valor).toFixed(2).replace('.', ',')}</span>
-                        </div>
-                    `;
+                            <span class="description">${t.description || (pago ? 'Pagamento' : 'Compra')}</span>
+                            <span class="value">${pago ? '+ ' : '- '}R$ ${parseFloat(t.valor).toFixed(2).replace('.', ',')}</span>
+                        </div>`;
                 });
-
-                historicoDiv.appendChild(diaBloco);
+                container.appendChild(bloco);
             }
+        }
+
+        function carregarSimulacao() {
+            const mock = {
+                nome: "Cliente de Teste",
+                limite_total: 200,
+                lojistas: { nome_comercial: "Loja Exemplo", telefone: "5511999999999", chave_pix: "exemplo@pix.com" }
+            };
+            const trans = [
+                { data_hora: new Date().toISOString(), tipo: 'venda', valor: 50.00, description: 'Exemplo de Compra' }
+            ];
+            montarTela(mock, trans);
         }
 
         document.addEventListener('DOMContentLoaded', carregarDados);
