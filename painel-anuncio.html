@@ -3,173 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Anúncios</title>
+    <title>Painel de Vendas Psicológicas</title>
     <style>
+        :root {
+            --primary: #28a745;
+            --accent: #6f42c1;
+            --bg: #f8f9fa;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
         }
         .container {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 500px;
-            padding: 25px;
+            max-width: 600px;
+            padding: 30px;
             box-sizing: border-box;
         }
         h1 {
-            color: #333;
+            color: #222;
             text-align: center;
-            font-size: 1.6em;
-            margin-bottom: 20px;
+            font-size: 1.8em;
+            margin-bottom: 25px;
         }
-        .campo {
-            margin-bottom: 15px;
+        .campo { margin-bottom: 20px; }
+        
+        /* Gatilhos Mentais Labels */
+        .trigger-label {
+            display: inline-block;
+            font-size: 0.7em;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-bottom: 5px;
+            font-weight: 800;
         }
+        .curiosidade { background: #fff3cd; color: #856404; }
+        .desejo { background: #d1ecf1; color: #0c5460; }
+        .escassez { background: #f8d7da; color: #721c24; }
+        .prova-social { background: #d4edda; color: #155724; }
+
         label {
             display: block;
             font-weight: 600;
-            color: #555;
-            margin-bottom: 5px;
-            font-size: 0.9em;
+            color: #444;
+            margin-bottom: 8px;
         }
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 1em;
-            font-family: inherit;
-        }
-        textarea {
-            resize: vertical;
-            height: 80px;
-        }
-        button {
+        input, textarea {
             width: 100%;
             padding: 12px;
-            background-color: #28a745;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        textarea { height: 100px; }
+
+        /* Preview Real-time */
+        .preview-box {
+            background: #f1f3f5;
+            border: 1px dashed #ced4da;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .preview-title { font-weight: bold; color: var(--accent); margin-bottom: 5px; }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary);
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 1em;
+            border-radius: 8px;
+            font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            transition: transform 0.2s, background 0.3s;
         }
         button:hover {
             background-color: #218838;
+            transform: translateY(-2px);
         }
-        #mensagem {
-            text-align: center;
-            margin-top: 15px;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        #mensagem { text-align: center; margin-top: 15px; font-weight: bold; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.js"></script>
 </head>
 <body>
 
     <div class="container">
-        <h1>📢 Atualizar Anúncio</h1>
+        <h1>🚀 Painel de Ofertas</h1>
+
+        <div class="preview-box">
+            <div style="font-size: 0.8em; color: #666; margin-bottom: 10px;">Visualização do Anúncio:</div>
+            <div id="p-titulo" class="preview-title">Título Exemplo</div>
+            <div id="p-desc" style="font-size: 0.9em; color: #444;">A descrição aparecerá aqui...</div>
+            <div id="p-preco" style="font-weight: 900; color: #d63384; margin-top: 5px;">R$ 0,00</div>
+        </div>
         
         <div class="campo">
-            <label for="titulo">Título do Anúncio (Ex: Desejo do dia: Açaí!):</label>
-            <input type="text" id="titulo" placeholder="Digite o título chamativo...">
+            <span class="trigger-label curiosidade">Curiosidade</span>
+            <label for="titulo">Título Chamativo:</label>
+            <input type="text" id="titulo" placeholder="Ex: O segredo que ninguém te contou sobre o nosso açaí...">
         </div>
 
         <div class="campo">
-            <label for="descricao">Descrição (A copy que criamos):</label>
-            <textarea id="descricao" placeholder="Escreva os detalhes do produto..."></textarea>
+            <span class="trigger-label prova-social">Prova Social</span>
+            <span class="trigger-label escassez">Escassez</span>
+            <label for="descricao">Descrição Persuasiva:</label>
+            <textarea id="descricao" placeholder="Ex: Mais de 500 pedidos hoje! Restam apenas 7 unidades do lote especial..."></textarea>
         </div>
 
         <div class="campo">
-            <label for="preco">Preço (Ex: R$ 16,00 o litro):</label>
-            <input type="text" id="preco" placeholder="Digite o valor ou promoção...">
+            <span class="trigger-label desejo">Desejo</span>
+            <label for="preco">Preço / Promoção:</label>
+            <input type="text" id="preco" placeholder="Ex: APENAS R$ 14,90 (Só enquanto durar o estoque)">
         </div>
 
         <div class="campo">
-            <label for="link">Link da Shopee ou WhatsApp:</label>
-            <input type="text" id="link" placeholder="https://...">
+            <label for="link">Link da Ação (CTA):</label>
+            <input type="text" id="link" placeholder="Link do WhatsApp ou Checkout">
         </div>
 
-        <button id="btn-salvar">Salvar Novo Anúncio</button>
+        <button id="btn-salvar">Publicar Oferta Irresistível</button>
         
         <p id="mensagem"></p>
     </div>
 
     <script>
-        // Suas credenciais do Supabase
         const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
-        
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Carregar o anúncio atual quando a página abrir
+        // Atualização do Preview em Tempo Real
+        const fields = ['titulo', 'descricao', 'preco'];
+        fields.forEach(field => {
+            document.getElementById(field).addEventListener('input', (e) => {
+                const target = field === 'descricao' ? 'p-desc' : (field === 'titulo' ? 'p-titulo' : 'p-preco');
+                document.getElementById(target).innerText = e.target.value || "...";
+            });
+        });
+
         async function carregarAnuncioAtual() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('anuncios')
-                    .select('*')
-                    .eq('id', 1)
-                    .single();
-
+                const { data } = await supabaseClient.from('anuncios').select('*').eq('id', 1).single();
                 if (data) {
                     document.getElementById('titulo').value = data.titulo || '';
                     document.getElementById('descricao').value = data.descricao || '';
                     document.getElementById('preco').value = data.preco || '';
                     document.getElementById('link').value = data.link || '';
+                    // Dispara o evento de input para atualizar o preview
+                    fields.forEach(f => document.getElementById(f).dispatchEvent(new Event('input')));
                 }
-            } catch (err) {
-                console.error("Erro ao carregar os dados:", err);
-            }
+            } catch (err) { console.error("Erro ao carregar:", err); }
         }
 
-        // Salvar as alterações no banco de dados
         document.getElementById('btn-salvar').addEventListener('click', async () => {
             const btn = document.getElementById('btn-salvar');
             const msg = document.getElementById('mensagem');
-            
             btn.disabled = true;
-            btn.innerText = "Salvando...";
-            msg.innerText = "";
+            btn.innerText = "Propagando oferta...";
 
-            const dadosAtualizados = {
-                id: 1, // Força a gravar sempre na linha de ID 1
+            const dados = {
+                id: 1,
                 titulo: document.getElementById('titulo').value,
                 descricao: document.getElementById('descricao').value,
                 preco: document.getElementById('preco').value,
                 link: document.getElementById('link').value
             };
 
-            // UPSERT: Se não existir a linha 1, ele cria. Se existir, ele atualiza!
-            const { error } = await supabaseClient
-                .from('anuncios')
-                .upsert(dadosAtualizados);
+            const { error } = await supabaseClient.from('anuncios').upsert(dados);
 
             btn.disabled = false;
-            btn.innerText = "Salvar Novo Anúncio";
+            btn.innerText = "Publicar Oferta Irresistível";
 
             if (error) {
                 msg.style.color = "#dc3545";
-                msg.innerText = "Erro ao salvar! Tente novamente.";
-                console.error(error);
+                msg.innerText = "Houve um problema. Tente novamente.";
             } else {
                 msg.style.color = "#28a745";
-                msg.innerText = "Anúncio atualizado com sucesso! 🎉";
+                msg.innerText = "Oferta atualizada! Gatilhos mentais ativados. 💣";
             }
         });
 
-        // Executa ao carregar a página
         document.addEventListener('DOMContentLoaded', carregarAnuncioAtual);
     </script>
 </body>
