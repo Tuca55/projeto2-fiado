@@ -3,286 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RENDA EXTRA HOME OFFICE - VAGAS LIMITADAS</title>
+    <title>MÉTODO HOME OFFICE - RENDA EXTRA IMEDIATA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #ffc107;
-            --secondary: #28a745;
-            --dark: #1a1a1a;
-            --danger: #dc3545;
-            --text-light: #f8f9fa;
+            --gold: #ffcc00;
+            --success: #28a745;
+            --dark-bg: #0a0a0a;
+            --card-bg: #161616;
+            --text-color: #f4f4f4;
+            --danger: #ff3e3e;
         }
 
         body {
-            font-family: 'Montserrat', sans-serif, Arial;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
             margin: 0;
-            background-color: #0b0b0b;
-            color: #e0e0e0;
-            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
-        /* Gatilho: Urgência/Escassez no Topo */
-        .top-bar {
+        .scarcity-bar {
             background: var(--danger);
-            color: white;
+            color: #fff;
             text-align: center;
             padding: 10px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            padding: 80px 20px;
+            padding: 60px 20px;
             text-align: center;
-            border-bottom: 4px solid var(--primary);
+            background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%);
         }
 
         .hero h1 {
-            font-size: 2.8rem;
-            color: var(--primary);
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--gold);
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            line-height: 1.1;
         }
 
-        .hero p { font-size: 1.4rem; color: #fff; max-width: 800px; margin: 0 auto; }
+        .video-container {
+            max-width: 800px;
+            margin: 40px auto;
+            border: 3px solid var(--gold);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+            background: #000;
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+        }
 
-        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
 
-        /* Gatilho: Curiosidade */
-        .curiosidade-box {
-            background: #222;
-            border: 2px solid var(--primary);
+        /* ESTILO DA MÁGICA: Esconde o conteúdo inicial */
+        #delayed-content {
+            display: none;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .partners-box {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-top: -30px;
+            border: 1px solid #333;
+        }
+
+        .logos {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            opacity: 0.6;
+            filter: grayscale(100%);
+        }
+
+        .anchoring-section {
+            background: #111;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 40px 0;
+            border: 1px solid #222;
+        }
+
+        .old-guru-price { text-decoration: line-through; color: var(--danger); font-size: 1.4rem; }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 15px;
-            margin: -60px auto 40px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .curiosidade-box h2 { color: var(--primary); margin-top: 0; }
-
-        /* Gatilho: Prova Social */
-        .testimonials {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin: 40px 0;
-        }
-
-        .test-card {
-            background: #1a1a1a;
-            padding: 20px;
-            border-radius: 10px;
-            border-bottom: 3px solid var(--secondary);
-        }
-
-        .test-card p { font-style: italic; font-size: 0.95rem; }
-        .test-card span { font-weight: bold; color: var(--secondary); display: block; margin-top: 10px; }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 40px 0;
-        }
-
-        .step {
             text-align: center;
-            padding: 20px;
-            background: #252525;
-            border-radius: 10px;
+            border: 1px solid #222;
         }
 
-        .step i { font-size: 2.5rem; color: var(--primary); margin-bottom: 15px; }
-
-        /* Gatilho: Desejo / Oferta Irresistível */
-        .offer-card {
-            background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+        .social-proof {
+            background: #111;
+            padding: 60px 20px;
             border-radius: 20px;
-            padding: 40px;
+            margin: 40px 0;
+        }
+
+        .offer-section {
             text-align: center;
-            border: 2px solid var(--secondary);
-            margin: 50px 0;
+            background: linear-gradient(145deg, #161616, #000);
+            padding: 60px 20px;
+            border-radius: 30px;
+            border: 2px solid var(--gold);
+            margin: 60px 0;
         }
 
-        .price-tag {
-            font-size: 4rem;
-            color: var(--secondary);
-            font-weight: 900;
-            margin: 10px 0;
-        }
+        .new-price { font-size: 5rem; font-weight: 900; color: var(--success); }
 
-        .btn-cta {
-            background: var(--secondary);
+        .btn-main {
+            background: var(--success);
             color: white;
-            padding: 25px 50px;
-            border-radius: 50px;
-            font-size: 1.5rem;
+            padding: 25px 60px;
+            font-size: 1.8rem;
+            font-weight: 900;
             text-decoration: none;
-            font-weight: bold;
+            border-radius: 50px;
             display: inline-block;
-            transition: all 0.3s;
-            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+            animation: pulse 2s infinite;
             text-transform: uppercase;
         }
 
-        .btn-cta:hover {
-            transform: scale(1.05);
-            background: #218838;
-            box-shadow: 0 15px 30px rgba(40, 167, 69, 0.5);
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
-        .escassez-texto {
-            color: var(--danger);
-            font-weight: bold;
-            margin-top: 15px;
-            display: block;
-        }
+        .faq-box { background: var(--card-bg); padding: 40px; border-radius: 20px; }
 
-        .faq { background: #111; padding: 40px; border-radius: 10px; margin-top: 50px; }
-        .faq h3 { color: var(--primary); }
+        footer { text-align: center; padding: 40px; opacity: 0.5; font-size: 0.8rem; }
 
-        .whatsapp-float {
+        .whatsapp-btn {
             position: fixed;
             bottom: 30px;
             right: 30px;
             background: #25d366;
             color: white;
-            width: 65px;
-            height: 65px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 35px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            text-decoration: none;
-            z-index: 999;
+            font-size: 40px;
+            z-index: 1000;
         }
 
         @media (max-width: 768px) {
             .hero h1 { font-size: 1.8rem; }
-            .price-tag { font-size: 2.5rem; }
+            .new-price { font-size: 3.5rem; }
+            .btn-main { font-size: 1.2rem; padding: 20px 30px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        ⚠️ ATENÇÃO: ÚLTIMAS 12 VAGAS DISPONÍVEIS PARA MANAUS E REGIÃO
+    <div class="scarcity-bar">
+        🔥 ALERTA: Restam apenas <span id="vagas">8</span> vagas com risco zero hoje!
     </div>
 
     <section class="hero">
-        <h1>DESCUBRA O SEGREDO PARA FATURAR R$ 400 A R$ 1.000 POR SEMANA SEM SAIR DE CASA!</h1>
-        <p>Você só precisa de um celular, internet e 2 horas do seu dia. O método testado e aprovado por mais de 15.000 pessoas.</p>
+        <div class="container">
+            <h1>ASSISTA AO VÍDEO ABAIXO PARA LIBERAR SEU ACESSO</h1>
+            
+            <div class="video-container">
+                <div id="player"></div>
+            </div>
+        </div>
     </section>
 
-    <div class="container">
-        <div class="curiosidade-box">
-            <h2><i class="fas fa-lock-open"></i> O que as grandes empresas não te contam?</h2>
-            <p>Google, Amazon e Netflix pagam milhares de reais todos os meses para pessoas comuns realizarem tarefas simples como avaliação de sites e preenchimento de formulários. Nós liberamos o caminho das pedras para você começar <strong>hoje mesmo</strong>.</p>
-        </div>
-
-        <h2 style="text-align: center; color: var(--primary);">VEJA QUEM JÁ ESTÁ FATURANDO (PROVA SOCIAL)</h2>
-        <div class="testimonials">
-            <div class="test-card">
-                <p>"Estava desempregada e com contas atrasadas. No meu primeiro mês fiz R$ 1.200 trabalhando só à noite. Salvou minha vida!"</p>
-                <span>— Mariana S., Manaus-AM</span>
-            </div>
-            <div class="test-card">
-                <p>"O material é direto ao ponto. Em 48h eu já tinha recuperado meus 15 reais e já estava no lucro. Recomendo muito!"</p>
-                <span>— Ricardo F., São Paulo-SP</span>
-            </div>
-            <div class="test-card">
-                <p>"Trabalho como Uber e faço isso nos intervalos. Consigo tirar uma grana extra sensacional pra ajudar nas despesas de casa."</p>
-                <span>— João P., Curitiba-PR</span>
-            </div>
-        </div>
-
-        <h2 style="text-align: center;">COMO FUNCIONA? É SIMPLES:</h2>
-        <div class="steps-grid">
-            <div class="step">
-                <i class="fas fa-file-alt"></i>
-                <h3>1. Receba o Material</h3>
-                <p>Acesso imediato ao kit Home Office 7.0.</p>
-            </div>
-            <div class="step">
-                <i class="fas fa-check-double"></i>
-                <h3>2. Escolha as Tarefas</h3>
-                <p>Avalie sites, mídias ou digite formulários.</p>
-            </div>
-            <div class="step">
-                <i class="fas fa-hand-holding-usd"></i>
-                <h3>3. Receba o PIX</h3>
-                <p>Pagamento direto na sua conta todo santo dia.</p>
-            </div>
-        </div>
-
-        <div class="offer-card">
-            <h3>VOCÊ ESTÁ A UM PASSO DA SUA LIBERDADE FINANCEIRA</h3>
-            <p>Garanta seu Kit de Treinamento Completo + Bônus Exclusivos</p>
-            <div style="text-decoration: line-through; color: #888;">De: R$ 97,00</div>
-            <div class="price-tag">R$ 15,00</div>
-            <p><strong>Aproveite o preço promocional por tempo limitado!</strong></p>
+    <div id="delayed-content">
+        <div class="container">
             
-            <a href="https://mpago.la/2EcmLRC" class="btn-cta">
-                <i class="fas fa-rocket"></i> QUERO COMEÇAR AGORA!
-            </a>
-
-            <span class="escassez-texto">
-                <i class="fas fa-clock"></i> Oferta expira em: <span id="timer">09:57</span>
-            </span>
-            
-            <div style="margin-top: 20px;">
-                <p>PIX: <strong>clarasantosfonsec@gmail.com</strong></p>
-                <img src="https://logospng.org/download/pix/logo-pix-1024.png" width="80" alt="Pix">
+            <div class="partners-box">
+                <h3>TRABALHE INDEPENDENTE PARA GRANDES PROJETOS</h3>
+                <div class="logos">
+                    <i class="fab fa-google"></i>
+                    <i class="fab fa-amazon"></i>
+                    <i class="fab fa-facebook"></i>
+                    <i class="fab fa-netflix"></i>
+                </div>
             </div>
-        </div>
 
-        <div class="faq">
-            <h2 style="text-align: center;">DÚVIDAS FREQUENTES</h2>
-            <h3>P: Preciso de experiência?</h3>
-            <p>R: Não! O treinamento ensina o passo a passo do zero, mesmo para quem não entende nada de internet.</p>
-            
-            <h3>P: É golpe?</h3>
-            <p>R: De forma alguma. Trabalhamos sob a Lei N°6.667/13. Você está comprando um material didático (infoproduto) que te ensina a prestar serviços como freelancer.</p>
-            
-            <h3>P: Quanto tempo demora para receber o material?</h3>
-            <p>R: Via PIX ou Cartão o envio é imediato para o seu e-mail!</p>
-        </div>
+            <div class="anchoring-section">
+                <h2>POR QUE NOSSO VALOR É DIFERENTE?</h2>
+                <p class="old-guru-price">VALOR PRATICADO NO MERCADO: R$ 947,00</p>
+                <p>O valor justo do nosso material é <strong>R$ 97,00</strong>.</p>
+            </div>
 
-        <p style="text-align: center; margin-top: 50px; font-size: 0.8rem; opacity: 0.6;">
-            Equipe CM ATIVA Seu Negócio na Internet | Todos os direitos reservados.
-        </p>
+            <div class="features">
+                <div class="feature-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>Você Faz Seu Horário</h3>
+                    <p>Você decide quando e quanto quer ganhar.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Só Precisa de um Celular</h3>
+                    <p>Seu smartphone e internet são suficientes.</p>
+                </div>
+            </div>
+
+            <div class="social-proof">
+                <h2 style="text-align: center; color: var(--gold);">RESULTADOS REAIS</h2>
+                <div class="testimonial-grid">
+                    <div class="testimonial-card">
+                        <p>"Recebi meus primeiros R$ 50,00 no PIX no terceiro dia!"</p>
+                        <strong>- Anderson L. (Manaus, AM)</strong>
+                    </div>
+                </div>
+            </div>
+
+            <section id="comprar" class="offer-section">
+                <h2 style="text-transform: uppercase;">GARANTIA BLINDADA</h2>
+                <p>Pague apenas a entrada de 15% hoje:</p>
+                <div class="new-price">R$ 15,00</div>
+                <br>
+                <a href="https://mpago.la/2EcmLRC" class="btn-main">SIM! QUERO TESTAR AGORA</a>
+                <p><small>O restante você só paga em 30 dias se lucrar!</small></p>
+            </section>
+
+            <div class="faq-box">
+                <h2 style="text-align: center;">FAQ</h2>
+                <div class="faq-item">
+                    <h4>P: Como recebo o dinheiro?</h4>
+                    <p>R: Direto no seu Mercado Pago ou conta bancária.</p>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <a href="https://wa.me/message/U5IGNMY5ES5QD1" class="whatsapp-float">
+    <footer>
+        <p>EQUIPE CM ATIVA - TODOS OS DIREITOS RESERVADOS</p>
+    </footer>
+
+    <a href="https://wa.me/message/U5IGNMY5ES5QD1" class="whatsapp-btn" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
     <script>
-        // Simples script para o cronômetro de escassez
-        function startTimer(duration, display) {
-            var timer = duration, minutes, seconds;
-            setInterval(function () {
-                minutes = parseInt(timer / 60, 10);
-                seconds = parseInt(timer % 60, 10);
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-                display.textContent = minutes + ":" + seconds;
-                if (--timer < 0) { timer = duration; }
-            }, 1000);
-        }
-        window.onload = function () {
-            var tenMinutes = 60 * 10,
-            display = document.querySelector('#timer');
-            startTimer(tenMinutes, display);
-        };
-    </script>
+        // Carrega a API do YouTube
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+        var player;
+        var magicTime = 90; // TEMPO EM SEGUNDOS PARA APARECER O CONTEÚDO (01:30)
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'BSS_-jMhzxA',
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 1,
+                    'rel': 0,
+                    'showinfo': 0
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                setInterval(function() {
+                    var currentTime = player.getCurrentTime();
+                    if (currentTime >= magicTime) {
+                        document.getElementById('delayed-content').style.display = 'block';
+                    }
+                }, 1000);
+            }
+        }
+
+        // Contador de vagas
+        let vagas = 8;
+        setInterval(() => {
+            if (vagas > 2) {
+                vagas--;
+                document.getElementById('vagas').innerText = vagas;
+            }
+        }, 15000);
+    </script>
 </body>
 </html>
