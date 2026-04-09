@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiado Fácil - O Fim do Caderno de Papel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #25d366;
+            --secondary: #075e54;
+            --accent: #ff3e3e;
+            --dark: #1e1e1e;
+            --light: #f4f7f6;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--light); color: var(--dark); line-height: 1.6; }
+        
+        /* Gatilho: Urgência - Barra de Topo */
+        .top-bar { background: var(--accent); color: white; text-align: center; padding: 8px; font-size: 14px; font-weight: bold; }
+
+        header { background: white; padding: 40px 20px; text-align: center; border-bottom: 3px solid var(--primary); }
+        h1 { font-size: 2.2em; margin-bottom: 10px; color: var(--secondary); }
+        .hero-sub { font-size: 1.1em; color: #666; max-width: 600px; margin: 0 auto 25px; }
+
+        /* Gatilho: Desejo - Vídeo ou Imagem de Demonstração */
+        .preview-container { max-width: 320px; margin: 20px auto; border: 8px solid #333; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .preview-container img { width: 100%; display: block; }
+
+        .cta-container { padding: 40px 20px; text-align: center; }
+        .btn-cta { background: var(--primary); color: white; padding: 20px 40px; border-radius: 50px; text-decoration: none; font-size: 1.3em; font-weight: bold; display: inline-block; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3); transition: 0.3s; animation: pulse 2s infinite; }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Gatilho: Curiosidade - Benefícios */
+        .features { padding: 40px 20px; background: white; }
+        .feature-item { margin-bottom: 30px; display: flex; align-items: flex-start; }
+        .feature-item i { color: var(--primary); font-size: 1.5em; margin-right: 15px; margin-top: 5px; }
+        .feature-item h3 { margin: 0; color: var(--secondary); }
+
+        /* Gatilho: Escassez - Preço e Vagas */
+        .pricing { background: var(--secondary); color: white; padding: 50px 20px; text-align: center; }
+        .price-tag { font-size: 3em; font-weight: bold; margin: 10px 0; }
+        .scarcity-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; border: 1px dashed #fff; display: inline-block; margin-top: 20px; }
+
+        footer { text-align: center; padding: 20px; font-size: 12px; color: #999; }
+
+        @media (max-width: 600px) { h1 { font-size: 1.8em; } }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        ⚠️ ATENÇÃO: Somente mais 7 vagas para o suporte de instalação gratuita em Manaus!
+    </div>
+
+    <header>
+        <h1>Sua máquina de cartão agora gerencia sua caderneta!</h1>
+        <p class="hero-sub">O <b>Fiado Fácil</b> transforma sua Moderninha, Stone ou Celular em um terminal profissional de cobrança. Chega de perder dinheiro com papel molhado ou sumido.</p>
+        
+        <div class="preview-container">
+            <img src="https://i.imgur.com/b87f63.png" alt="Interface Fiado Fácil">
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="feature-item">
+            <i class="fas fa-bolt"></i>
+            <div>
+                <h3>Lançamento em 5 segundos</h3>
+                <p>Abra, digite o valor e pronto. Tão rápido quanto passar um cartão.</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-shield-alt"></i>
+            <div>
+                <h3>100% Seguro</h3>
+                <p>Não instala nada. Roda no navegador da máquina. Seus dados protegidos na nuvem do Supabase.</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-mobile-alt"></i>
+            <div>
+                <h3>Link direto para o Cliente</h3>
+                <p>O cliente recebe o extrato pelo WhatsApp e sabe exatamente quanto deve. Transparência total.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <h2>OFERTA DE LANÇAMENTO</h2>
+        <p>Tenha o controle total do seu comércio por menos de 0,70 centavos por dia.</p>
+        <div class="price-tag">R$ 20,00<span style="font-size: 16px;">/mês</span></div>
+        
+        <div class="scarcity-box">
+            🔥 <b>Vagas Limitadas:</b> Devido ao suporte presencial para configuração das máquinas Smart, aceitamos apenas 10 novos lojistas por semana.
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="https://wa.me/5592XXXXXXXXX?text=Quero+ativar+o+Fiado+Fácil+na+minha+máquina" class="btn-cta">
+                <i class="fab fa-whatsapp"></i> ATIVAR AGORA NA MINHA MÁQUINA
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 Fiado Fácil - Soluções Tecnológicas para Varejo de Bairro<br>
+        Betânia, Manaus - AM
+    </footer>
+
+</body>
+</html>
