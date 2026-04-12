@@ -6,7 +6,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Master em Honra - Micro SaaS</title>
     <style>
-        .active-pilar { border-color: #4f46e5; background-color: #f5f3ff; }
+        .active-pilar { border-color: #4f46e5 !important; background-color: #f5f3ff !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans">
@@ -19,9 +19,9 @@
 
         <div class="mb-8 p-4 border-l-4 border-amber-400 bg-amber-50 rounded-r-lg">
             <h2 class="font-bold flex items-center">
-                <span>👂 Pronto para Ouvir [cite: 9]</span>
+                <span>👂 Pronto para Ouvir</span>
             </h2>
-            <p class="text-[10px] text-amber-700 mb-3 uppercase font-bold">Tiago 1:19 - Demore para falar</p>
+            <p class="text-[10px] text-amber-700 mb-3 uppercase font-bold text-wrap">Tiago 1:19 - Demore para falar [cite: 9]</p>
             <div class="flex items-center justify-between">
                 <span id="timer" class="text-2xl font-mono font-bold text-amber-700">05:00</span>
                 <button id="btnTimer" onclick="startTimer()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-1 rounded-full text-sm transition shadow-sm">Iniciar Foco</button>
@@ -29,22 +29,22 @@
         </div>
 
         <div class="mb-8">
-            <h2 class="font-bold mb-2 flex items-center">💎 Mural de Admiração [cite: 7]</h2>
+            <h2 class="font-bold mb-2 flex items-center">💎 Mural de Admiração</h2>
             <p class="text-xs text-slate-500 mb-3 italic">"Diga o quanto ela é importante para você"[cite: 12].</p>
             <textarea id="admiraInput" rows="2" class="w-full p-3 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="O que você admira nela hoje?"></textarea>
             <button onclick="salvarElogio()" class="w-full mt-2 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition shadow-md">Registrar e Enviar</button>
         </div>
 
         <div class="grid grid-cols-2 gap-4 text-center">
-            <button onclick="togglePilar(this, 'gentileza')" class="p-4 border-2 rounded-xl transition hover:shadow-md bg-white">
+            <button onclick="togglePilar(this, 'gentileza')" class="p-4 border-2 rounded-xl transition hover:shadow-md bg-white border-slate-200">
                 <div class="text-2xl">🙏</div>
-                <div class="text-[10px] font-bold uppercase mt-1">Gentileza? [cite: 4, 5]</div>
-                <div class="text-[8px] text-slate-400 mt-1">"Por favor e Obrigado"</div>
+                <div class="text-[10px] font-bold uppercase mt-1">Gentileza? [cite: 5]</div>
+                <div class="text-[8px] text-slate-400 mt-1">"Por favor e Obrigado" [cite: 5]</div>
             </button>
-            <button onclick="togglePilar(this, 'brandura')" class="p-4 border-2 rounded-xl transition hover:shadow-md bg-white">
+            <button onclick="togglePilar(this, 'brandura')" class="p-4 border-2 rounded-xl transition hover:shadow-md bg-white border-slate-200">
                 <div class="text-2xl">🕊️</div>
                 <div class="text-[10px] font-bold uppercase mt-1">Tom Brando? [cite: 10]</div>
-                <div class="text-[8px] text-slate-400 mt-1">"Mesmo se houver diferença"</div>
+                <div class="text-[8px] text-slate-400 mt-1">"Mesmo se houver diferença" [cite: 10]</div>
             </button>
         </div>
         
@@ -58,40 +58,36 @@
         
         const supabase = createClient('https://dxlsknikveslsupngshw.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM')
 
-        // Estado local para os check-ins
         let stats = { gentileza: false, brandura: false };
 
-        // Função para alternar visual e estado dos pilares
         window.togglePilar = async (el, tipo) => {
             stats[tipo] = !stats[tipo];
             if (stats[tipo]) {
                 el.classList.add('active-pilar');
-                // Salva o check-in no Supabase
-                await supabase.from('registros_honra').insert([{ [`pilar_${tipo}`]: true }]);
+                const payload = tipo === 'gentileza' ? { pilar_gentileza: true } : { pilar_brandura: 5 };
+                const { error } = await supabase.from('registros_honra').insert([payload]);
+                if(error) console.error("Erro Supabase:", error);
             } else {
                 el.classList.remove('active-pilar');
             }
         };
 
-        // Função para salvar elogio (Pilar 2)
         window.salvarElogio = async () => {
             const input = document.getElementById('admiraInput');
             const elogio = input.value.trim();
-            
             if(!elogio) return alert("Escreva um elogio antes de registrar.");
             
             const { error } = await supabase.from('registros_honra').insert([{ pilar_admiracao: elogio }]);
             
             if(!error) {
-                alert("Admiração registrada! Um marido que honra a esposa diz coisas que fazem ela se sentir bem[cite: 13].");
+                alert("Admiração registrada! [cite: 13, 15]");
                 input.value = '';
             } else {
-                console.error(error);
-                alert("Erro ao salvar. Verifique sua conexão.");
+                console.error("Erro detalhado:", error);
+                alert("Erro ao salvar. Verifique se as políticas RLS foram configuradas no Supabase.");
             }
         }
 
-        // Timer de Escuta Ativa (Pilar 3)
         window.startTimer = () => {
             let seconds = 300;
             const display = document.getElementById('timer');
@@ -109,10 +105,8 @@
                     display.innerText = "05:00";
                     btn.disabled = false;
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    
-                    // Registra sucesso na escuta no Supabase
                     await supabase.from('registros_honra').insert([{ pilar_escuta: 5 }]);
-                    alert("Excelente! Você foi pronto para ouvir[cite: 9]. Isso faz com que ela se sinta amada[cite: 15].");
+                    alert("Excelente! Você praticou a escuta ativa. [cite: 9]");
                 }
             }, 1000);
         }
